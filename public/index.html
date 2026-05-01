@@ -1,115 +1,135 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GranVekov</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gran Vekov</title>
 
+<style>
+body{
+  margin:0;
+  font-family: Arial;
+  background:#0b0b10;
+  color:white;
+}
 
+header{
+  padding:20px;
+  text-align:center;
+  font-size:28px;
+  font-weight:bold;
+  background:#141420;
+}
 
+/* GRID */
+.container{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap:20px;
+  padding:20px;
+  padding-bottom:120px;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f0f0f;
-      color: white;
-    }
+/* CARD */
+.card{
+  background:#1a1a25;
+  border-radius:16px;
+  padding:12px;
+  transition:.2s;
+  box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
+.card:hover{transform:scale(1.03)}
 
-    header {
-      padding: 20px;
-      text-align: center;
-      background: #1a1a1a;
-      font-size: 24px;
-      font-weight: bold;
-    }
+.card img{
+  width:100%;
+  border-radius:12px;
+}
 
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
+/* BUTTONS */
+button{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#ff3c3c;
+  color:white;
+}
+button:hover{background:#ff1f1f}
 
-    .card {
-      background: #1e1e1e;
-      border-radius: 15px;
-      padding: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      transition: transform 0.2s;
-    }
+/* TOP BAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 20px;
+  background:#111;
+}
 
-    .card:hover {
-      transform: scale(1.03);
-    }
+/* PLAYER */
+#player{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0f0f18;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-top:1px solid #333;
+}
 
-    img {
-      width: 100%;
-      border-radius: 10px;
-    }
+#player img{
+  width:50px;
+  height:50px;
+  border-radius:8px;
+}
 
-    h3 {
-      margin: 10px 0;
-    }
+#progress{
+  width:200px;
+}
 
-    audio {
-      width: 100%;
-    }
+/* SMALL TEXT */
+.small{
+  font-size:12px;
+  color:#aaa;
+}
 
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #ff3c3c;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #ff1f1f;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: #141414;
-    }
-
-    .stats {
-      font-size: 14px;
-      color: #aaa;
-    }
-
-    .donate {
-      background: #00c853;
-    }
-
-  </style>
+a{color:#4da3ff}
+</style>
 </head>
+
 <body>
 
-<header>🎵 Грань Веков</header>
-
+<header>🎧 Gran Vekov</header>
 
 <div class="topbar">
-  <div class="stats" id="stats">Загрузка...</div>
-  <button class="donate" onclick="donate()">Поддержать автора</button>
+  <div id="stats">Загрузка...</div>
+  <button onclick="donate()">💰 Донат</button>
 </div>
 
-<!-- Ad block -->
-<div style="text-align:center; margin:20px;">
-  <p>Реклама (вставь Google AdSense)</p>
-</div>
+<div class="container" id="list"></div>
 
-<div class="container" id="musicList"></div>
+<!-- PLAYER -->
+<div id="player">
+  <img id="cover">
+  <div>
+    <div id="title"></div>
+    <div class="small" id="trackStats"></div>
+    <audio id="audio"></audio>
+    <input id="progress" type="range" min="0" value="0">
+  </div>
+
+  <button onclick="prev()">⏮</button>
+  <button onclick="toggle()">▶️</button>
+  <button onclick="next()">⏭</button>
+</div>
 
 <script>
 
 const tracks = [
-  {
+{
     title: "Чёрная лампа",
     file: "music/track1.mp3",
     cover:  "music/cover1.jpeg",
@@ -121,63 +141,101 @@ const tracks = [
     file: "music/track2.mp3",
     cover: "music/cover2.jpeg",
     plays: 0
-  }
+ }
 ];
 
-const container = document.getElementById("musicList");
+let current=0;
 
-tracks.forEach((track, index) => {
-  const card = document.createElement("div");
-  card.className = "card";
+const audio=document.getElementById("audio");
+const title=document.getElementById("title");
+const cover=document.getElementById("cover");
+const stats=document.getElementById("stats");
+const trackStats=document.getElementById("trackStats");
+const progress=document.getElementById("progress");
 
-  card.innerHTML = `
-    <img src="${track.cover}">
-    <h3>${track.title}</h3>
-    <audio controls onplay="addPlay(${index})">
-      <source src="${track.file}" type="audio/mpeg">
-    </audio>
-    <button onclick="download('${track.file}')">Скачать</button>
-    <div>Прослушиваний: <span id="plays-${index}">0</span></div>
-  `;
-
-  container.appendChild(card);
-});
-
-function addPlay(index) {
-  tracks[index].plays++;
-  document.getElementById(`plays-${index}`).innerText = tracks[index].plays;
-
-  let total = localStorage.getItem("totalPlays") || 0;
-  total++;
-  localStorage.setItem("totalPlays", total);
-  updateStats();
+/* LOAD */
+function load(i){
+  current=i;
+  audio.src=tracks[i].file;
+  title.innerText=tracks[i].title;
+  cover.src=tracks[i].cover;
+  audio.play();
+  savePlay(i);
 }
 
-function download(file) {
-  const a = document.createElement("a");
-  a.href = file;
-  a.download = "";
+/* NEXT PREV */
+function next(){load((current+1)%tracks.length)}
+function prev(){load((current-1+tracks.length)%tracks.length)}
+
+function toggle(){
+  if(audio.paused) audio.play();
+  else audio.pause();
+}
+
+/* AUTOPLAY */
+audio.onended=next;
+
+/* PROGRESS BAR */
+audio.ontimeupdate=()=>{
+  progress.value=(audio.currentTime/audio.duration)*100;
+}
+
+progress.oninput=()=>{
+  audio.currentTime=(progress.value/100)*audio.duration;
+}
+
+/* RENDER LIST */
+const list=document.getElementById("list");
+
+tracks.forEach((t,i)=>{
+  list.innerHTML+=`
+  <div class="card">
+    <img src="${t.cover}">
+    <h3>${t.title}</h3>
+
+    <button onclick="load(${i})">▶ Play</button>
+    <button onclick="download('${t.file}')">⬇ Скачать</button>
+
+    <div class="small">Прослушиваний: <span id="p${i}">0</span></div>
+  </div>
+  `;
+});
+
+/* DOWNLOAD */
+function download(f){
+  const a=document.createElement("a");
+  a.href=f;
+  a.download="";
   a.click();
 }
 
-function donate() {
-  alert("Добавь сюда ссылку на донаты (например PayPal или Stripe)");
+/* LOCAL STATS */
+function savePlay(i){
+  let key="track_"+i;
+  let val=localStorage.getItem(key)||0;
+  val++;
+  localStorage.setItem(key,val);
+  document.getElementById("p"+i).innerText=val;
 }
 
-function updateStats() {
-  const visits = localStorage.getItem("visits") || 0;
-  const plays = localStorage.getItem("totalPlays") || 0;
-  document.getElementById("stats").innerText = `Посещения: ${visits} | Прослушивания: ${plays}`;
+/* GLOBAL STATS */
+function updateStats(){
+  let total=0;
+  tracks.forEach((_,i)=>{
+    total+=Number(localStorage.getItem("track_"+i)||0);
+  });
+  stats.innerText="Прослушивания: "+total;
 }
 
-let visits = localStorage.getItem("visits") || 0;
-visits++;
-localStorage.setItem("visits", visits);
-
+setInterval(updateStats,1000);
 updateStats();
+
+/* DONATE */
+function donate(){
+  window.open("https://paypal.me/yourlink","_blank");
+}
 
 </script>
 
 </body>
 </html>
-
