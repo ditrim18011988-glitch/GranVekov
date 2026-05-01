@@ -1,6 +1,11 @@
-body {
-  background: black;
+body{
+  margin:0;
+  font-family: Arial;
+  background: radial-gradient(circle at top, #151522, #0b0b10);
+  color:white;
 }
+
+/* TOPBAR */
 .topbar{
   position: sticky;
   top: 0;
@@ -30,7 +35,7 @@ body {
 }
 
 .actions button{
-  padding:8px 12px;
+  padding:8px 14px;
   border:none;
   border-radius:10px;
   cursor:pointer;
@@ -44,6 +49,43 @@ body {
   background:#3a3a55;
   transform:scale(1.05);
 }
+
+/* GRID */
+.container{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap:20px;
+  padding:20px;
+  padding-bottom:140px;
+}
+
+/* CARD */
+.card{
+  background:#1a1a25;
+  border-radius:16px;
+  padding:12px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform: translateY(-5px) scale(1.02);
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+
+.card img{
+  width:100%;
+  border-radius:12px;
+}
+
+/* ОБЩИЕ КНОПКИ */
+button{
+  border:none;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -52,9 +94,9 @@ body {
 
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:15px;
 
-  padding:10px;
+  padding:10px 20px;
   background:rgba(10,10,15,0.9);
   backdrop-filter: blur(15px);
 
@@ -62,8 +104,8 @@ body {
 }
 
 #cover{
-  width:50px;
-  height:50px;
+  width:55px;
+  height:55px;
   border-radius:8px;
 }
 
@@ -71,35 +113,42 @@ body {
   flex:1;
 }
 
+/* CONTROLS */
 .controls{
   display:flex;
-  gap:8px;
-  margin-top:4px;
+  gap:10px;
+  margin:5px 0;
 }
 
-button{
+.controls button{
   background:#2a2a3a;
-  border:none;
-  color:white;
   padding:6px 10px;
-  border-radius:8px;
 }
 
-button:hover{
+.controls button:hover{
   background:#3a3a55;
 }
-body{
-  background: radial-gradient(circle at top, #151522, #0b0b10);
+
+/* ПРОГРЕСС (КРАСИВЫЙ) */
+#progress{
+  width:100%;
+  appearance:none;
+  height:4px;
+  background:#333;
+  border-radius:5px;
+  outline:none;
 }
 
-.card{
-  transition:0.3s;
+#progress::-webkit-slider-thumb{
+  appearance:none;
+  width:10px;
+  height:10px;
+  background:#ff3c3c;
+  border-radius:50%;
+  cursor:pointer;
 }
 
-.card:hover{
-  transform: translateY(-5px) scale(1.02);
-  box-shadow:0 10px 30px rgba(0,0,0,0.6);
-}
+/* MOBILE */
 @media(max-width:600px){
   .container{
     grid-template-columns:1fr;
