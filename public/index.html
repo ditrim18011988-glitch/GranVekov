@@ -102,24 +102,37 @@ a{color:#4da3ff}
 
 <body>
 
-<header>🎧 Gran Vekov</header>
+<header>🎧 Грань Веков </header>
 
 <div class="topbar">
-  <div id="stats">Загрузка...</div>
-  <button onclick="donate()">💰 Донат</button>
+  <div class="logo">🎧 Gran Vekov</div>
+
+  <div class="actions">
+    <button onclick="ads()">📢 Реклама</button>
+    <button onclick="donate()">💰 Донат</button>
+  </div>
 </div>
 
 <div class="container" id="list"></div>
 
 <!-- PLAYER -->
 <div id="player">
+
   <img id="cover">
-  <div>
-    <div id="title"></div>
-    <div class="small" id="trackStats"></div>
-    <audio id="audio"></audio>
+
+  <div class="info">
+    <div id="title">—</div>
+
+    <div class="controls">
+      <button onclick="prev()">⏮</button>
+      <button onclick="toggle()" id="playBtn">▶️</button>
+      <button onclick="next()">⏭</button>
+    </div>
+
     <input id="progress" type="range" min="0" value="0">
   </div>
+
+</div>
 
   <button onclick="prev()">⏮</button>
   <button onclick="toggle()">▶️</button>
@@ -239,3 +252,7 @@ function donate(){
 
 </body>
 </html>
+<div class="monetization">
+  <button onclick="donate()">💰 Поддержать</button>
+  <button onclick="ads()">📢 Реклама</button>
+</div>
