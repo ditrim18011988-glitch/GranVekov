@@ -23,22 +23,29 @@ body{
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-/* LOGO (центр ощущение премиум) */
+/* 🔥 ЦЕНТР ЛОГО (ИСПРАВЛЕНО) */
 .logo{
+  flex:1;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
 }
 
+/* 🔥 БОЛЬШОЙ ЛОГО */
 .logo img{
-  height:90px;
-  transition:0.3s;
+  height:150px;     /* ← ОСНОВНОЙ РАЗМЕР */
+  width:auto;
+
+  max-width:100%;
+  object-fit:contain;
+
   border-radius:12px;
+  transition:0.3s;
 }
 
 .logo img:hover{
   transform: scale(1.05);
-  filter: drop-shadow(0 0 10px rgba(255,60,60,0.4));
+  filter: drop-shadow(0 0 15px rgba(255,60,60,0.4));
 }
 
 /* SIDE BUTTONS */
@@ -73,7 +80,7 @@ body{
   padding-bottom:140px;
 }
 
-/* CARD (glass + depth) */
+/* CARD */
 .card{
   background: linear-gradient(145deg, #1a1a25, #14141f);
   border-radius:16px;
@@ -102,7 +109,7 @@ button{
   transition:0.2s;
 }
 
-/* PLAYER (premium bar) */
+/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -148,7 +155,7 @@ button{
   background:#3a3a55;
 }
 
-/* PROGRESS BAR (modern) */
+/* PROGRESS */
 #progress{
   width:100%;
   appearance:none;
@@ -185,6 +192,6 @@ button{
   }
 
   .logo img{
-    height:70px;
+    height:110px;
   }
 }
