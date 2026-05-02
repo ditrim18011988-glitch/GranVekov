@@ -23,7 +23,7 @@ body{
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-/* кнопки по бокам */
+/* кнопки */
 .actions{
   display:flex;
   gap:10px;
@@ -46,35 +46,38 @@ body{
   transform:scale(1.05);
 }
 
-/* 🔥 ГЛАВНЫЙ ЛОГО ЭКРАН (СИЛЬНО УВЕЛИЧЕН) */
+/* 🔥 ГЛАВНЫЙ ФИКС: ЛОГО ЦЕНТР И БОЛЬШОЙ */
 .logo{
-  position: absolute;
+  position: fixed;        /* ← ВАЖНО: убираем конфликт с topbar */
+  top:70px;               /* ниже шапки */
   left:50%;
   transform: translateX(-50%);
-  top:10px;
+
+  z-index:500;
 
   display:flex;
   justify-content:center;
   align-items:center;
 
-  pointer-events:none; /* чтобы не мешал кликам */
+  pointer-events:none;
 }
 
 .logo img{
-  height:320px;   /* 🔥 ОЧЕНЬ БОЛЬШОЙ РАЗМЕР */
-  width:auto;
+  height:380px !important;   /* 🔥 ГЛАВНЫЙ РАЗМЕР */
+  width:auto !important;
 
-  max-width:90vw;
+  max-width:95vw;
+
   object-fit:contain;
 
-  border-radius:16px;
+  border-radius:18px;
 
   transition:0.3s ease;
 }
 
 .logo img:hover{
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 30px rgba(255,60,60,0.6));
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 35px rgba(255,60,60,0.7));
 }
 
 /* GRID */
@@ -83,7 +86,7 @@ body{
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
   gap:20px;
   padding:20px;
-  padding-top:260px; /* чтобы контент не залезал под логотип */
+  padding-top:420px; /* важно — место под огромный логотип */
   padding-bottom:140px;
 }
 
@@ -177,10 +180,10 @@ body{
 /* MOBILE */
 @media(max-width:600px){
   .logo img{
-    height:180px;
+    height:220px !important;
   }
 
   .container{
-    padding-top:200px;
+    padding-top:300px;
   }
 }
