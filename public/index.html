@@ -13,7 +13,7 @@ body{
   color:white;
 }
 
-/* 🔥 TOPBAR С ЦЕНТРОМ */
+/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -22,23 +22,26 @@ body{
   background:#111;
 }
 
-/* ЛЕВО / ПРАВО */
 .side{
   width:60px;
   display:flex;
   justify-content:center;
 }
 
-/* 🔥 ЦЕНТР */
+/* 🔥 ЛОГО ВЫНЕСЕНО НОРМАЛЬНО */
 .logo{
-  flex:1;
+  width:100%;
   display:flex;
   justify-content:center;
+  margin:40px 0;
 }
 
 .logo img{
-  height:100px; /* ← БОЛЬШОЙ РАЗМЕР */
-  border-radius:12px;
+  height:420px;   /* 🔥 ВОТ ТУТ РЕАЛЬНЫЙ РАЗМЕР */
+  width:auto;
+  max-width:95vw;
+  display:block;
+  border-radius:16px;
 }
 
 /* GRID */
@@ -102,20 +105,18 @@ button{
 <body>
 
 <div class="topbar">
-
   <div class="side">
     <button onclick="ads()">📢</button>
-  </div>
-
-  <!-- 🔥 БОЛЬШОЙ ЦЕНТРАЛЬНЫЙ ЛОГО -->
-  <div class="logo">
-    <img src="music/logo.png" alt="logo">
   </div>
 
   <div class="side">
     <button onclick="donate()">💰</button>
   </div>
+</div>
 
+<!-- 🔥 ЛОГО ТЕПЕРЬ ОТДЕЛЬНО И РЕАЛЬНО УВЕЛИЧИВАЕТСЯ -->
+<div class="logo">
+  <img src="music/logo.png" alt="logo">
 </div>
 
 <div class="container" id="list"></div>
