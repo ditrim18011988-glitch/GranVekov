@@ -13,19 +13,7 @@ body{
   color:white;
 }
 
-/* УБРАЛИ HEADER */
-
-/* 🔥 ЛОГО */
-.logo{
-  display:flex;
-  align-items:center;
-}
-
-.logo img{
-  height:40px;
-  border-radius:8px;
-}
-
+/* 🔥 TOPBAR С ЦЕНТРОМ */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -34,6 +22,26 @@ body{
   background:#111;
 }
 
+/* ЛЕВО / ПРАВО */
+.side{
+  width:60px;
+  display:flex;
+  justify-content:center;
+}
+
+/* 🔥 ЦЕНТР */
+.logo{
+  flex:1;
+  display:flex;
+  justify-content:center;
+}
+
+.logo img{
+  height:100px; /* ← БОЛЬШОЙ РАЗМЕР */
+  border-radius:12px;
+}
+
+/* GRID */
 .container{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
@@ -63,6 +71,7 @@ button{
   color:white;
 }
 
+/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -94,13 +103,16 @@ button{
 
 <div class="topbar">
 
-  <!-- ✅ ТОЛЬКО ЛОГО -->
+  <div class="side">
+    <button onclick="ads()">📢</button>
+  </div>
+
+  <!-- 🔥 БОЛЬШОЙ ЦЕНТРАЛЬНЫЙ ЛОГО -->
   <div class="logo">
     <img src="music/logo.png" alt="logo">
   </div>
 
-  <div>
-    <button onclick="ads()">📢</button>
+  <div class="side">
     <button onclick="donate()">💰</button>
   </div>
 
