@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gran Vekov</title>
+<title>Грань Веков</title>
 
 <style>
 body{
@@ -20,9 +20,22 @@ header{
   background:#141420;
 }
 
+/* 🔥 ЛОГО */
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo img{
+  height:40px;
+  border-radius:8px;
+}
+
 .topbar{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   padding:10px 20px;
   background:#111;
 }
@@ -85,10 +98,16 @@ button{
 
 <body>
 
-<header>🎧 Грань Веков</header>
+<header>Грань Веков</header>
 
 <div class="topbar">
-  <div>Gran Vekov</div>
+
+  <!-- ✅ ВОТ ЗДЕСЬ ЛОГО -->
+  <div class="logo">
+    <img src="logo.png" alt="Gran Vekov">
+    <span>Грань Веков</span>
+  </div>
+
   <div>
     <button onclick="ads()">📢</button>
     <button onclick="donate()">💰</button>
@@ -162,11 +181,15 @@ function toggle(){
 audio.onended = next;
 
 audio.ontimeupdate = () => {
-  progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+  if(audio.duration){
+    progress.value = (audio.currentTime / audio.duration) * 100;
+  }
 }
 
 progress.oninput = () => {
-  audio.currentTime = (progress.value / 100) * audio.duration;
+  if(audio.duration){
+    audio.currentTime = (progress.value / 100) * audio.duration;
+  }
 }
 
 const list = document.getElementById("list");
@@ -184,8 +207,8 @@ tracks.forEach((t,i)=>{
 });
 
 function download(file){
-  const a = document.createElement("a");
-  a.href = file;
+  const a=document.createElement("a");
+  a.href=file;
   a.download="";
   a.click();
 }
