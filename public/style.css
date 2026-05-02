@@ -1,23 +1,21 @@
-body{
-  <h1 style="color:red; font-size:50px;">TEST OK</h1>
-}
-  margin:0;
+body {
+  margin: 0;
   font-family: Arial, sans-serif;
   background: radial-gradient(circle at top, #161625, #0b0b10);
-  color:white;
+  color: white;
 }
 
 /* TOPBAR */
-.topbar{
+.topbar {
   position: sticky;
   top: 0;
   z-index: 1000;
 
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  padding:20px;
+  padding: 20px;
 
   background: rgba(20,20,30,0.55);
   backdrop-filter: blur(16px);
@@ -26,57 +24,57 @@ body{
 }
 
 /* кнопки */
-.actions{
-  display:flex;
-  gap:10px;
+.actions {
+  display: flex;
+  gap: 10px;
 }
 
-.actions button{
-  padding:8px 14px;
-  border:none;
-  border-radius:10px;
+.actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
 
-  background:#2a2a3a;
-  color:white;
+  background: #2a2a3a;
+  color: white;
 
-  cursor:pointer;
-  transition:0.2s;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.actions button:hover{
-  background:#3a3a55;
-  transform:scale(1.05);
+.actions button:hover {
+  background: #3a3a55;
+  transform: scale(1.05);
 }
 
-/* 🔥 ЛОГО — ЖИВОЙ И ЦЕНТРАЛЬНЫЙ */
-.logo{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+/* 🔥 ЛОГО — ЖИВОЙ И ЦЕНТР */
+.logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  margin-top:40px;
-  margin-bottom:20px;
+  margin-top: 40px;
+  margin-bottom: 20px;
 }
 
-/* 🔥 ЖИВОЙ ЛОГО (АНИМАЦИЯ) */
-.logo img{
-  height:420px !important;
-  width:auto !important;
+/* 🔥 ЖИВАЯ АНИМАЦИЯ ЛОГО */
+.logo img {
+  height: 420px !important;
+  width: auto !important;
 
-  max-width:95vw;
-  object-fit:contain;
+  max-width: 95vw;
+  object-fit: contain;
 
-  border-radius:20px;
+  border-radius: 20px;
 
   animation: logoFloat 4s ease-in-out infinite;
 
-  transition:0.3s ease;
+  transition: 0.3s ease;
 
   filter: drop-shadow(0 0 20px rgba(255,60,60,0.25));
 }
 
-/* дыхание + парение */
+/* движение + дыхание */
 @keyframes logoFloat {
   0% {
     transform: translateY(0px) scale(1);
@@ -92,111 +90,111 @@ body{
   }
 }
 
-/* hover эффект */
-.logo img:hover{
+/* hover */
+.logo img:hover {
   transform: scale(1.08);
   filter: drop-shadow(0 0 60px rgba(255,60,60,0.8));
 }
 
 /* GRID */
-.container{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap:20px;
-  padding:20px;
-  padding-bottom:140px;
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  padding-bottom: 140px;
 }
 
 /* CARD */
-.card{
+.card {
   background: linear-gradient(145deg, #1a1a25, #14141f);
-  border-radius:16px;
-  padding:12px;
+  border-radius: 16px;
+  padding: 12px;
 
-  transition:0.3s;
-  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+  transition: 0.3s;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-.card:hover{
+.card:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
 
-.card img{
-  width:100%;
-  border-radius:12px;
+.card img {
+  width: 100%;
+  border-radius: 12px;
 }
 
 /* PLAYER */
-#player{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
+#player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
 
-  display:flex;
-  align-items:center;
-  gap:15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 
-  padding:12px 18px;
+  padding: 12px 18px;
 
   background: rgba(10,10,15,0.85);
   backdrop-filter: blur(18px);
 
-  border-top:1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-#cover{
-  width:60px;
-  height:60px;
-  border-radius:10px;
+#cover {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
 }
 
-.info{
-  flex:1;
+.info {
+  flex: 1;
 }
 
-.controls{
-  display:flex;
-  gap:10px;
-  margin-top:6px;
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
 }
 
-.controls button{
-  background:#2a2a3a;
-  padding:7px 12px;
-  border:none;
-  color:white;
-  border-radius:10px;
+.controls button {
+  background: #2a2a3a;
+  padding: 7px 12px;
+  border: none;
+  color: white;
+  border-radius: 10px;
 }
 
-.controls button:hover{
-  background:#3a3a55;
+.controls button:hover {
+  background: #3a3a55;
 }
 
 /* PROGRESS */
-#progress{
-  width:100%;
-  appearance:none;
-  height:4px;
-  background:#333;
-  border-radius:5px;
-  outline:none;
-  margin-top:6px;
+#progress {
+  width: 100%;
+  appearance: none;
+  height: 4px;
+  background: #333;
+  border-radius: 5px;
+  outline: none;
+  margin-top: 6px;
 }
 
-#progress::-webkit-slider-thumb{
-  appearance:none;
-  width:10px;
-  height:10px;
-  background:#ff3c3c;
-  border-radius:50%;
-  cursor:pointer;
+#progress::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #ff3c3c;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 /* MOBILE */
-@media(max-width:600px){
-  .logo img{
-    height:260px !important;
+@media (max-width: 600px) {
+  .logo img {
+    height: 260px !important;
   }
 }
