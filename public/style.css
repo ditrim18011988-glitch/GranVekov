@@ -1,4 +1,7 @@
 body{
+  body {
+  background: red !important;
+}
   margin:0;
   font-family: Arial, sans-serif;
   background: radial-gradient(circle at top, #161625, #0b0b10);
