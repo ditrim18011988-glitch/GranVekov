@@ -46,38 +46,34 @@ body{
   transform:scale(1.05);
 }
 
-/* 🔥 ГЛАВНЫЙ ФИКС: ЛОГО ЦЕНТР И БОЛЬШОЙ */
+/* 🔥 ЛОГО — ПРАВИЛЬНЫЙ ЦЕНТР БЕЗ БАГОВ */
 .logo{
-  position: fixed;        /* ← ВАЖНО: убираем конфликт с topbar */
-  top:70px;               /* ниже шапки */
-  left:50%;
-  transform: translateX(-50%);
-
-  z-index:500;
-
+  width:100%;
   display:flex;
   justify-content:center;
   align-items:center;
 
-  pointer-events:none;
+  margin-top:40px;
+  margin-bottom:20px;
 }
 
+/* 🔥 БОЛЬШОЙ И СТАБИЛЬНЫЙ РАЗМЕР */
 .logo img{
-  height:380px !important;   /* 🔥 ГЛАВНЫЙ РАЗМЕР */
+  height:420px !important;   /* ← ВОТ ТЕПЕРЬ ОЧЕНЬ БОЛЬШОЙ */
   width:auto !important;
 
   max-width:95vw;
 
   object-fit:contain;
 
-  border-radius:18px;
+  border-radius:20px;
 
   transition:0.3s ease;
 }
 
 .logo img:hover{
-  transform: scale(1.06);
-  filter: drop-shadow(0 0 35px rgba(255,60,60,0.7));
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 40px rgba(255,60,60,0.7));
 }
 
 /* GRID */
@@ -86,7 +82,8 @@ body{
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
   gap:20px;
   padding:20px;
-  padding-top:420px; /* важно — место под огромный логотип */
+
+  padding-top:20px;
   padding-bottom:140px;
 }
 
@@ -180,10 +177,6 @@ body{
 /* MOBILE */
 @media(max-width:600px){
   .logo img{
-    height:220px !important;
-  }
-
-  .container{
-    padding-top:300px;
+    height:260px !important;
   }
 }
