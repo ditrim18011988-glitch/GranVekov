@@ -13,18 +13,12 @@ body{
   color:white;
 }
 
-header{
-  padding:20px;
-  text-align:center;
-  font-size:28px;
-  background:#141420;
-}
+/* УБРАЛИ HEADER */
 
 /* 🔥 ЛОГО */
 .logo{
   display:flex;
   align-items:center;
-  gap:10px;
 }
 
 .logo img{
@@ -98,20 +92,18 @@ button{
 
 <body>
 
-<header>Грань Веков</header>
-
 <div class="topbar">
 
-  <!-- ✅ ВОТ ЗДЕСЬ ЛОГО -->
+  <!-- ✅ ТОЛЬКО ЛОГО -->
   <div class="logo">
-    <img src="logo.png" alt="Gran Vekov">
-    <span>Грань Веков</span>
+    <img src="music/logo.png" alt="logo">
   </div>
 
   <div>
     <button onclick="ads()">📢</button>
     <button onclick="donate()">💰</button>
   </div>
+
 </div>
 
 <div class="container" id="list"></div>
