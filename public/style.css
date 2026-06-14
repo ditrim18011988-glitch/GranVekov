@@ -3,6 +3,7 @@ body {
   font-family: Arial, sans-serif;
   background: radial-gradient(circle at top, #161625, #0b0b10);
   color: white;
+  cursor: url("music/rock-cursor.png"), auto;
 }
 
 /* TOPBAR */
@@ -46,7 +47,7 @@ body {
   transform: scale(1.05);
 }
 
-/* 🔥 ЛОГО — ЖИВОЙ И ЦЕНТР */
+/* ЛОГО */
 .logo {
   width: 100%;
   display: flex;
@@ -57,7 +58,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* 🔥 ЖИВАЯ АНИМАЦИЯ ЛОГО */
 .logo img {
   height: 420px !important;
   width: auto !important;
@@ -74,7 +74,6 @@ body {
   filter: drop-shadow(0 0 20px rgba(255,60,60,0.25));
 }
 
-/* движение + дыхание */
 @keyframes logoFloat {
   0% {
     transform: translateY(0px) scale(1);
@@ -90,7 +89,6 @@ body {
   }
 }
 
-/* hover */
 .logo img:hover {
   transform: scale(1.08);
   filter: drop-shadow(0 0 60px rgba(255,60,60,0.8));
@@ -111,15 +109,33 @@ body {
   border-radius: 16px;
   padding: 12px;
 
-  transition: 0.3s;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.5s ease forwards;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+
+  cursor: pointer;
 }
 
+/* появление */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* hover эффект */
 .card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  transform: translateY(-8px) scale(1.03);
+  box-shadow:
+    0 0 25px rgba(255,60,60,0.25),
+    0 20px 50px rgba(0,0,0,0.6);
 }
 
+/* изображение */
 .card img {
   width: 100%;
   border-radius: 12px;
@@ -166,6 +182,8 @@ body {
   border: none;
   color: white;
   border-radius: 10px;
+  cursor: url("music/rock-cursor.png"), pointer;
+  transition: 0.2s;
 }
 
 .controls button:hover {
@@ -196,26 +214,5 @@ body {
 @media (max-width: 600px) {
   .logo img {
     height: 260px !important;
-  }
-}
-body {
-  cursor: url("music/rock-cursor.png"), auto;
-}
-button,
-a,
-.card,
-.controls button {
-  cursor: url("music/rock-cursor.png"), pointer;
-}
-.card {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: fadeIn 0.5s ease forwards;
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
