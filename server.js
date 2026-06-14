@@ -2,11 +2,10 @@ const express = require('express');
 const app = express();
 const path = require('path');
 
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 
-app.get('/music/:name', (req, res) => {
-  const file = path.join(__dirname, 'music', req.params.name);
-  res.sendFile(file);
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(3000, () => {
