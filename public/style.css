@@ -198,3 +198,6 @@ body {
     height: 260px !important;
   }
 }
+body {
+  cursor: url("music/rock-cursor.png"), auto;
+}
