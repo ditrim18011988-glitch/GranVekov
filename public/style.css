@@ -115,16 +115,32 @@ body {
   transition: 0.3s;
 }
 
+/* hover */
 .card:hover {
   transform: translateY(-10px) scale(1.04);
-  box-shadow: 0 0 30px rgba(255,60,60,0.25),
-              0 25px 60px rgba(0,0,0,0.7);
+  box-shadow:
+    0 0 30px rgba(255,60,60,0.25),
+    0 25px 60px rgba(0,0,0,0.7);
 }
 
 .card:hover::before {
   opacity: 1;
 }
 
+/* 🔥 АКТИВНЫЙ ТРЕК */
+.card.active {
+  border: 1px solid #ff3c3c;
+  box-shadow:
+    0 0 35px rgba(255,60,60,0.4),
+    0 25px 60px rgba(0,0,0,0.7);
+  transform: translateY(-6px) scale(1.03);
+}
+
+.card.active::before {
+  opacity: 1;
+}
+
+/* image */
 .card img {
   width: 100%;
   border-radius: 12px;
