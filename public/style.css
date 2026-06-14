@@ -201,3 +201,9 @@ body {
 body {
   cursor: url("music/rock-cursor.png"), auto;
 }
+button,
+a,
+.card,
+.controls button {
+  cursor: url("music/rock-cursor.png"), pointer;
+}
