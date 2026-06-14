@@ -13,7 +13,6 @@ body{
   color:white;
 }
 
-/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -28,7 +27,6 @@ body{
   justify-content:center;
 }
 
-/* 🔥 ЛОГО ВЫНЕСЕНО НОРМАЛЬНО */
 .logo{
   width:100%;
   display:flex;
@@ -37,14 +35,13 @@ body{
 }
 
 .logo img{
-  height:420px;   /* 🔥 ВОТ ТУТ РЕАЛЬНЫЙ РАЗМЕР */
+  height:420px;
   width:auto;
   max-width:95vw;
   display:block;
   border-radius:16px;
 }
 
-/* GRID */
 .container{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
@@ -74,7 +71,6 @@ button{
   color:white;
 }
 
-/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -99,7 +95,8 @@ button{
 .controls button{
   width:auto;
 }
-  button,
+
+button,
 a,
 .card,
 .controls button {
@@ -120,7 +117,6 @@ a,
   </div>
 </div>
 
-<!-- 🔥 ЛОГО ТЕПЕРЬ ОТДЕЛЬНО И РЕАЛЬНО УВЕЛИЧИВАЕТСЯ -->
 <div class="logo">
   <img src="music/logo.png" alt="logo">
 </div>
@@ -147,20 +143,20 @@ a,
 <script>
 
 const tracks = [
-{
-  title:"Чёрная лампа",
-  file:"music/track1.mp3",
-  cover:"music/cover1.jpg"
-},
-{
-  title:"Всадники Ада",
-  file:"music/track2.mp3",
-  cover:"music/cover2.jpg"
-},
- { 
- title:"Чёрное рождество",
-  file:"music/track3.mp3",
-  cover:"music/cover3.png"
+  {
+    title:"Чёрная лампа",
+    file:"music/track1.mp3",
+    cover:"music/cover1.jpg"
+  },
+  {
+    title:"Всадники Ада",
+    file:"music/track2.mp3",
+    cover:"music/cover2.jpg"
+  },
+  {
+    title:"Чёрное рождество",
+    file:"music/track3.mp3",
+    cover:"music/cover3.png"
   }
 ];
 
@@ -217,15 +213,16 @@ tracks.forEach((t,i)=>{
     <h3>${t.title}</h3>
 
     <button onclick="load(${i})">▶ Play</button>
-    <button onclick="download('${t.file}')">⬇ Скачать</button>
+    <button onclick="download(${i})">⬇ Скачать</button>
   </div>
   `;
 });
 
-function download(file){
-  const a=document.createElement("a");
-  a.href=file;
-  a.download="";
+function download(i){
+  const t = tracks[i];
+  const a = document.createElement("a");
+  a.href = t.file;
+  a.download = t.title + ".mp3";
   a.click();
 }
 
