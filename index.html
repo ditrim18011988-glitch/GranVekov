@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Грань Веков</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial;
+  background:#0b0b10;
+  color:white;
+}
+
+/* TOPBAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 20px;
+  background:#111;
+}
+
+.side{
+  width:60px;
+  display:flex;
+  justify-content:center;
+}
+
+/* 🔥 ЛОГО ВЫНЕСЕНО НОРМАЛЬНО */
+.logo{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  margin:40px 0;
+}
+
+.logo img{
+  height:420px;   /* 🔥 ВОТ ТУТ РЕАЛЬНЫЙ РАЗМЕР */
+  width:auto;
+  max-width:95vw;
+  display:block;
+  border-radius:16px;
+}
+
+/* GRID */
+.container{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap:20px;
+  padding:20px;
+  padding-bottom:120px;
+}
+
+.card{
+  background:#1a1a25;
+  border-radius:16px;
+  padding:12px;
+}
+
+.card img{
+  width:100%;
+  border-radius:12px;
+}
+
+button{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#ff3c3c;
+  color:white;
+}
+
+/* PLAYER */
+#player{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#111;
+  padding:10px;
+  display:flex;
+  gap:10px;
+}
+
+#cover{
+  width:50px;
+  height:50px;
+}
+
+.controls{
+  display:flex;
+  gap:5px;
+}
+
+.controls button{
+  width:auto;
+}
+  button,
+a,
+.card,
+.controls button {
+  cursor: url("music/rock-cursor.png"), pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="side">
+    <button onclick="ads()">📢</button>
+  </div>
+
+  <div class="side">
+    <button onclick="donate()">💰</button>
+  </div>
+</div>
+
+<!-- 🔥 ЛОГО ТЕПЕРЬ ОТДЕЛЬНО И РЕАЛЬНО УВЕЛИЧИВАЕТСЯ -->
+<div class="logo">
+  <img src="music/logo.png" alt="logo">
+</div>
+
+<div class="container" id="list"></div>
+
+<div id="player">
+  <img id="cover">
+
+  <div>
+    <div id="title">Выбери трек</div>
+
+    <div class="controls">
+      <button onclick="prev()">⏮</button>
+      <button onclick="toggle()" id="playBtn">▶️</button>
+      <button onclick="next()">⏭</button>
+    </div>
+
+    <input id="progress" type="range" value="0">
+    <audio id="audio"></audio>
+  </div>
+</div>
+
+<script>
+
+const tracks = [
+{
+  title:"Чёрная лампа",
+  file:"music/track1.mp3",
+  cover:"music/cover1.jpeg"
+},
+{
+  title:"Всадники Ада",
+  file:"music/track2.mp3",
+  cover:"music/cover2.jpeg"
+}
+];
+
+let current = 0;
+
+const audio = document.getElementById("audio");
+const title = document.getElementById("title");
+const cover = document.getElementById("cover");
+const progress = document.getElementById("progress");
+const playBtn = document.getElementById("playBtn");
+
+function load(i){
+  current = i;
+  audio.src = tracks[i].file;
+  title.innerText = tracks[i].title;
+  cover.src = tracks[i].cover;
+  audio.play();
+  playBtn.innerText = "⏸";
+}
+
+function next(){ load((current+1)%tracks.length); }
+function prev(){ load((current-1+tracks.length)%tracks.length); }
+
+function toggle(){
+  if(audio.paused){
+    audio.play();
+    playBtn.innerText = "⏸";
+  } else {
+    audio.pause();
+    playBtn.innerText = "▶️";
+  }
+}
+
+audio.onended = next;
+
+audio.ontimeupdate = () => {
+  if(audio.duration){
+    progress.value = (audio.currentTime / audio.duration) * 100;
+  }
+}
+
+progress.oninput = () => {
+  if(audio.duration){
+    audio.currentTime = (progress.value / 100) * audio.duration;
+  }
+}
+
+const list = document.getElementById("list");
+
+tracks.forEach((t,i)=>{
+  list.innerHTML += `
+  <div class="card">
+    <img src="${t.cover}">
+    <h3>${t.title}</h3>
+
+    <button onclick="load(${i})">▶ Play</button>
+    <button onclick="download('${t.file}')">⬇ Скачать</button>
+  </div>
+  `;
+});
+
+function download(file){
+  const a=document.createElement("a");
+  a.href=file;
+  a.download="";
+  a.click();
+}
+
+function donate(){
+  window.open("https://paypal.me/yourlink","_blank");
+}
+
+function ads(){
+  alert("Реклама здесь");
+}
+
+</script>
+
+</body>
+</html>
