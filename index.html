@@ -218,12 +218,23 @@ tracks.forEach((t,i)=>{
   `;
 });
 
-function download(i){
+async function download(i){
   const t = tracks[i];
+
+  const response = await fetch(t.file);
+  const blob = await response.blob();
+
+  const url = window.URL.createObjectURL(blob);
+
   const a = document.createElement("a");
-  a.href = t.file;
+  a.href = url;
   a.download = t.title + ".mp3";
+
+  document.body.appendChild(a);
   a.click();
+
+  a.remove();
+  window.URL.revokeObjectURL(url);
 }
 
 function donate(){
@@ -236,5 +247,7 @@ function ads(){
 
 </script>
 
+</body>
+</html>
 </body>
 </html>
