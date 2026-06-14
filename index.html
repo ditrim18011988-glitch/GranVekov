@@ -42,6 +42,7 @@ body{
   border-radius:16px;
 }
 
+/* GRID */
 .container{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
@@ -50,6 +51,7 @@ body{
   padding-bottom:120px;
 }
 
+/* CARD */
 .card {
   background:#1a1a25;
   border-radius:16px;
@@ -58,6 +60,15 @@ body{
   opacity: 0;
   transform: translateY(12px);
   animation: fadeIn 0.5s ease forwards;
+
+  transition: 0.25s ease;
+}
+
+/* активный трек */
+.card.active{
+  border:1px solid #ff3c3c;
+  box-shadow:0 0 25px rgba(255,60,60,0.4);
+  transform: translateY(-6px) scale(1.03);
 }
 
 @keyframes fadeIn {
@@ -96,6 +107,7 @@ button{
 #cover{
   width:50px;
   height:50px;
+  border-radius:8px;
 }
 
 .controls{
@@ -152,7 +164,6 @@ a,
 </div>
 
 <script>
-
 const tracks = [
   {
     title:"Чёрная лампа",
@@ -172,20 +183,33 @@ const tracks = [
 ];
 
 let current = 0;
+let cards = [];
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
+const list = document.getElementById("list");
 
+/* активный трек */
+function setActiveTrack(i){
+  cards.forEach(c => c.classList.remove("active"));
+  if(cards[i]) cards[i].classList.add("active");
+}
+
+/* загрузка */
 function load(i){
   current = i;
+
   audio.src = tracks[i].file;
   title.innerText = tracks[i].title;
   cover.src = tracks[i].cover;
+
   audio.play();
   playBtn.innerText = "⏸";
+
+  setActiveTrack(i);
 }
 
 function next(){ load((current+1)%tracks.length); }
@@ -207,35 +231,39 @@ audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
   }
-}
+};
 
 progress.oninput = () => {
   if(audio.duration){
     audio.currentTime = (progress.value / 100) * audio.duration;
   }
-}
+};
 
-const list = document.getElementById("list");
-
+/* карточки */
 tracks.forEach((t,i)=>{
-  list.innerHTML += `
-  <div class="card" style="animation-delay:${i * 0.1}s">
+  const div = document.createElement("div");
+  div.className = "card";
+  div.style.animationDelay = `${i*0.1}s`;
+
+  div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-
     <button onclick="load(${i})">▶ Play</button>
     <button onclick="download(${i})">⬇ Скачать</button>
-  </div>
   `;
+
+  list.appendChild(div);
+  cards.push(div);
 });
 
+/* download */
 async function download(i){
   const t = tracks[i];
 
   const response = await fetch(t.file);
   const blob = await response.blob();
 
-  const url = window.URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
   a.href = url;
@@ -245,7 +273,7 @@ async function download(i){
   a.click();
 
   a.remove();
-  window.URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url);
 }
 
 function donate(){
@@ -255,7 +283,6 @@ function donate(){
 function ads(){
   alert("Реклама здесь");
 }
-
 </script>
 
 </body>
