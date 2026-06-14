@@ -50,10 +50,21 @@ body{
   padding-bottom:120px;
 }
 
-.card{
+.card {
   background:#1a1a25;
   border-radius:16px;
   padding:12px;
+
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .card img{
@@ -208,7 +219,7 @@ const list = document.getElementById("list");
 
 tracks.forEach((t,i)=>{
   list.innerHTML += `
-  <div class="card">
+  <div class="card" style="animation-delay:${i * 0.1}s">
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
@@ -247,7 +258,5 @@ function ads(){
 
 </script>
 
-</body>
-</html>
 </body>
 </html>
