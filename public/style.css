@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: radial-gradient(circle at top, #161625, #0b0b10);
+  background: radial-gradient(circle at top, #141427, #07070c);
   color: white;
   cursor: url("music/rock-cursor.png"), auto;
 }
@@ -16,15 +16,14 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  padding: 20px;
+  padding: 16px 20px;
 
-  background: rgba(20,20,30,0.55);
-  backdrop-filter: blur(16px);
+  background: rgba(15, 15, 25, 0.6);
+  backdrop-filter: blur(18px);
 
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* кнопки */
 .actions {
   display: flex;
   gap: 10px;
@@ -35,63 +34,48 @@ body {
   border: none;
   border-radius: 10px;
 
-  background: #2a2a3a;
+  background: #222236;
   color: white;
 
-  cursor: pointer;
   transition: 0.2s;
+  cursor: pointer;
 }
 
 .actions button:hover {
-  background: #3a3a55;
+  background: #2f2f4a;
   transform: scale(1.05);
 }
 
-/* ЛОГО */
+/* LOGO */
 .logo {
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin: 40px 0;
 }
 
 .logo img {
   height: 420px !important;
   width: auto !important;
-
   max-width: 95vw;
-  object-fit: contain;
 
-  border-radius: 20px;
+  border-radius: 18px;
 
-  animation: logoFloat 4s ease-in-out infinite;
+  animation: floatLogo 4s ease-in-out infinite;
 
+  filter: drop-shadow(0 0 25px rgba(255,60,60,0.25));
   transition: 0.3s ease;
-
-  filter: drop-shadow(0 0 20px rgba(255,60,60,0.25));
-}
-
-@keyframes logoFloat {
-  0% {
-    transform: translateY(0px) scale(1);
-    filter: drop-shadow(0 0 15px rgba(255,60,60,0.2));
-  }
-  50% {
-    transform: translateY(-12px) scale(1.03);
-    filter: drop-shadow(0 0 40px rgba(255,60,60,0.5));
-  }
-  100% {
-    transform: translateY(0px) scale(1);
-    filter: drop-shadow(0 0 15px rgba(255,60,60,0.2));
-  }
 }
 
 .logo img:hover {
   transform: scale(1.08);
-  filter: drop-shadow(0 0 60px rgba(255,60,60,0.8));
+  filter: drop-shadow(0 0 70px rgba(255,60,60,0.7));
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
 }
 
 /* GRID */
@@ -105,40 +89,58 @@ body {
 
 /* CARD */
 .card {
-  background: linear-gradient(145deg, #1a1a25, #14141f);
+  background: linear-gradient(145deg, #1b1b2a, #101018);
   border-radius: 16px;
   padding: 12px;
 
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(12px);
   animation: fadeIn 0.5s ease forwards;
 
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  transition: 0.25s ease;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
 
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-/* появление */
+/* glow overlay */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255,60,60,0.15), transparent 60%);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.04);
+  box-shadow: 0 0 30px rgba(255,60,60,0.25),
+              0 25px 60px rgba(0,0,0,0.7);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 12px;
+  transition: 0.3s ease;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+/* fade in */
 @keyframes fadeIn {
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* hover эффект */
-.card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow:
-    0 0 25px rgba(255,60,60,0.25),
-    0 20px 50px rgba(0,0,0,0.6);
-}
-
-/* изображение */
-.card img {
-  width: 100%;
-  border-radius: 12px;
 }
 
 /* PLAYER */
@@ -150,19 +152,19 @@ body {
 
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 14px;
 
   padding: 12px 18px;
 
-  background: rgba(10,10,15,0.85);
-  backdrop-filter: blur(18px);
+  background: rgba(10,10,18,0.9);
+  backdrop-filter: blur(20px);
 
   border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 #cover {
-  width: 60px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
   border-radius: 10px;
 }
 
@@ -177,17 +179,18 @@ body {
 }
 
 .controls button {
-  background: #2a2a3a;
+  background: #222236;
   padding: 7px 12px;
   border: none;
   color: white;
   border-radius: 10px;
-  cursor: url("music/rock-cursor.png"), pointer;
+  cursor: pointer;
   transition: 0.2s;
 }
 
 .controls button:hover {
-  background: #3a3a55;
+  background: #2f2f4a;
+  transform: scale(1.05);
 }
 
 /* PROGRESS */
@@ -195,7 +198,7 @@ body {
   width: 100%;
   appearance: none;
   height: 4px;
-  background: #333;
+  background: #2a2a2a;
   border-radius: 5px;
   outline: none;
   margin-top: 6px;
