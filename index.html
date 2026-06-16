@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Грань Веков</title>
 
 <link rel="icon" href="music/favicon.png">
@@ -15,7 +15,8 @@ body{
   color:white;
   cursor: url("music/rock-cursor.png"), auto;
 
-  padding-bottom: 120px;
+  /* safe-area + плеер */
+  padding-bottom: calc(140px + env(safe-area-inset-bottom));
 }
 
 /* TOPBAR */
@@ -40,7 +41,7 @@ body{
 
 .side{ width:60px; display:flex; justify-content:center; }
 
-/* LOGO FIX */
+/* LOGO */
 .logo{
   display:flex;
   justify-content:center;
@@ -63,7 +64,7 @@ body{
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
   gap:20px;
   padding:20px;
-  padding-bottom:180px;
+  padding-bottom:220px;
 }
 
 /* CARD */
@@ -123,6 +124,7 @@ button{
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
+  transition:width 0.2s linear;
 }
 
 .downloadBtn span{
@@ -130,9 +132,7 @@ button{
   z-index:2;
 }
 
-/* =========================
-   PLAYER (MINI + COLLAPSE)
-========================= */
+/* ================= PLAYER ================= */
 
 #player{
   position:fixed;
@@ -158,7 +158,7 @@ button{
   padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
-/* COLLAPSED MODE */
+/* COLLAPSED */
 #player.collapsed{
   height:52px;
   overflow:hidden;
@@ -207,18 +207,13 @@ button{
 /* MOBILE */
 @media (max-width:768px){
 
-  body{
-    padding-bottom:140px;
-  }
-
   .container{
     grid-template-columns:repeat(2,1fr);
-    padding-bottom:220px;
+    padding-bottom:260px;
   }
 
-  #cover{
-    width:44px;
-    height:44px;
+  #search{
+    width:100%;
   }
 }
 </style>
@@ -241,7 +236,7 @@ button{
 <div id="player">
   <img id="cover">
 
-  <div>
+  <div style="flex:1">
     <div id="title">Выбери трек</div>
 
     <div class="controls">
@@ -254,7 +249,6 @@ button{
   </div>
 
   <button id="togglePlayer">▾</button>
-
   <audio id="audio"></audio>
 </div>
 
@@ -276,7 +270,6 @@ const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 
-/* SAFE PLAY */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
@@ -290,16 +283,10 @@ function load(i){
   cover.src = tracks[i].cover;
 
   safePlay();
-  setActive(i);
   syncUI();
 }
 
-function setActive(i){
-  cards.forEach(c => c.classList.remove("active"));
-  if(cards[i]) cards[i].classList.add("active");
-}
-
-/* PLAY TOGGLE */
+/* TOGGLE */
 function toggle(){
   if(audio.paused) safePlay();
   else audio.pause();
@@ -309,10 +296,24 @@ function toggle(){
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* UI SYNC */
+/* UI */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
+
+  cards.forEach((c,i)=>{
+    const btn = c.querySelector("button");
+    btn.textContent = (i === current && !audio.paused)
+      ? "⏸ Pause"
+      : "▶ Play";
+
+    c.classList.toggle("active", i === current);
+  });
 }
+
+/* EVENTS */
+audio.addEventListener("play", syncUI);
+audio.addEventListener("pause", syncUI);
+audio.addEventListener("ended", next);
 
 /* PROGRESS */
 audio.ontimeupdate = () => {
@@ -334,33 +335,13 @@ tracks.forEach((t,i)=>{
     <img src="${t.cover}">
     <h3>${t.title}</h3>
     <button onclick="load(${i})">▶ Play</button>
-
-    <div class="downloadBtn" onclick="downloadTrack(${i})">
-      <div class="fill"></div>
-      <span>⬇ Скачать</span>
-    </div>
   `;
 
   list.appendChild(div);
   cards.push(div);
 });
 
-/* DOWNLOAD */
-function downloadTrack(i){
-  const t = tracks[i];
-  fetch(t.file)
-    .then(r => r.blob())
-    .then(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = t.title + ".mp3";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-}
-
-/* COLLAPSE PLAYER */
+/* COLLAPSE */
 const player = document.getElementById("player");
 const toggleBtn = document.getElementById("togglePlayer");
 
@@ -372,7 +353,7 @@ toggleBtn.onclick = () => {
   toggleBtn.textContent = collapsed ? "▴" : "▾";
 };
 
-/* SWIPE DOWN TO COLLAPSE */
+/* SWIPE DOWN */
 let startY = 0;
 
 player.addEventListener("touchstart", e=>{
@@ -389,7 +370,6 @@ player.addEventListener("touchend", e=>{
   }
 });
 
-/* EXTRA */
 function donate(){ window.open("https://paypal.me/yourlink"); }
 function ads(){ alert("Реклама"); }
 
