@@ -6,8 +6,6 @@
 <title>Грань Веков</title>
 
 <link rel="icon" href="music/favicon.png">
-<link rel="shortcut icon" href="music/favicon.png">
-<link rel="apple-touch-icon" href="music/favicon.png">
 
 <style>
 body{
@@ -38,11 +36,7 @@ body{
   width:200px;
 }
 
-.side{
-  width:60px;
-  display:flex;
-  justify-content:center;
-}
+.side{ width:60px; display:flex; justify-content:center; }
 
 .logo{
   width:100%;
@@ -71,20 +65,18 @@ body{
   background:#1a1a25;
   border-radius:16px;
   padding:12px;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: fadeIn 0.5s ease forwards;
-  transition: 0.25s ease;
+  opacity:0;
+  transform:translateY(12px);
+  animation:fadeIn 0.5s ease forwards;
 }
 
 .card.active{
   border:1px solid #ff3c3c;
   box-shadow:0 0 25px rgba(255,60,60,0.4);
-  transform: translateY(-6px) scale(1.03);
 }
 
 @keyframes fadeIn {
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity:1; transform:translateY(0); }
 }
 
 .card img{
@@ -103,6 +95,35 @@ button{
   cursor:pointer;
 }
 
+/* ===== DOWNLOAD BUTTON ===== */
+.downloadBtn{
+  position:relative;
+  overflow:hidden;
+  border-radius:10px;
+  height:40px;
+  margin-top:8px;
+  background:#ff3c3c;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.downloadBtn .fill{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
+  transition:width 0.1s linear;
+}
+
+.downloadBtn span{
+  position:relative;
+  z-index:2;
+}
+
 #player{
   position:fixed;
   bottom:0;
@@ -114,35 +135,19 @@ button{
   gap:10px;
 }
 
-#cover{
-  width:50px;
-  height:50px;
-  border-radius:8px;
-}
+#cover{ width:50px; height:50px; border-radius:8px; }
 
-.controls{
-  display:flex;
-  gap:5px;
-}
-
-.controls button{
-  width:auto;
-}
+.controls{ display:flex; gap:5px; }
+.controls button{ width:auto; }
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <div class="side">
-    <button onclick="ads()">📢</button>
-  </div>
-
+  <div class="side"><button onclick="ads()">📢</button></div>
   <input id="search" placeholder="Поиск музыки...">
-
-  <div class="side">
-    <button onclick="donate()">💰</button>
-  </div>
+  <div class="side"><button onclick="donate()">💰</button></div>
 </div>
 
 <div class="logo">
@@ -153,7 +158,6 @@ button{
 
 <div id="player">
   <img id="cover">
-
   <div>
     <div id="title">Выбери трек</div>
 
@@ -163,7 +167,7 @@ button{
       <button onclick="next()">⏭</button>
     </div>
 
-    <input id="progress" type="range" value="0">
+    <input id="progress" type="range">
     <audio id="audio"></audio>
   </div>
 </div>
@@ -171,131 +175,143 @@ button{
 <script>
 
 const tracks = [
-  { title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg" },
-  { title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg" },
-  { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.png" }
+  {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
+  {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
+  {title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.png"}
 ];
 
-let current = 0;
-let cards = [];
-let cardButtons = [];
+let current=0;
+let cards=[];
+let downloadLocks=[];
 
-const audio = document.getElementById("audio");
-const title = document.getElementById("title");
-const cover = document.getElementById("cover");
-const progress = document.getElementById("progress");
-const playBtn = document.getElementById("playBtn");
-const list = document.getElementById("list");
-const search = document.getElementById("search");
+const audio=document.getElementById("audio");
+const title=document.getElementById("title");
+const cover=document.getElementById("cover");
+const progress=document.getElementById("progress");
+const playBtn=document.getElementById("playBtn");
+const list=document.getElementById("list");
+const search=document.getElementById("search");
 
-function setActiveTrack(i){
-  cards.forEach(c => c.classList.remove("active"));
+function setActive(i){
+  cards.forEach(c=>c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* 🔥 ГЛАВНАЯ ФИКСИРОВАННАЯ ЛОГИКА */
-function updateCardButtons(){
-  cardButtons.forEach((btn, i) => {
-    if(i === current && !audio.paused){
-      btn.innerText = "⏸ Playing";
-    } else {
-      btn.innerText = "▶ Play";
-    }
-  });
-}
-
 function load(i){
-  current = i;
-
-  audio.src = tracks[i].file;
-  title.innerText = tracks[i].title;
-  cover.src = tracks[i].cover;
-
+  current=i;
+  audio.src=tracks[i].file;
+  title.textContent=tracks[i].title;
+  cover.src=tracks[i].cover;
   audio.play();
-  playBtn.innerText = "⏸";
-
-  setActiveTrack(i);
-  updateCardButtons();
+  playBtn.textContent="⏸";
+  setActive(i);
 }
 
-function next(){ load((current+1)%tracks.length); }
-function prev(){ load((current-1+tracks.length)%tracks.length); }
+function next(){load((current+1)%tracks.length);}
+function prev(){load((current-1+tracks.length)%tracks.length);}
 
 function toggle(){
   if(audio.paused){
     audio.play();
-    playBtn.innerText = "⏸";
-  } else {
+    playBtn.textContent="⏸";
+  }else{
     audio.pause();
-    playBtn.innerText = "▶️";
+    playBtn.textContent="▶️";
   }
-  updateCardButtons();
 }
 
-audio.ontimeupdate = () => {
+audio.ontimeupdate=()=>{
   if(audio.duration){
-    progress.value = (audio.currentTime / audio.duration) * 100;
+    progress.value=(audio.currentTime/audio.duration)*100;
   }
 };
 
-progress.oninput = () => {
-  audio.currentTime = (progress.value / 100) * audio.duration;
+progress.oninput=()=>{
+  audio.currentTime=(progress.value/100)*audio.duration;
 };
 
-audio.onended = next;
+audio.onended=next;
 
-/* CARDS */
+/* ===== CARDS ===== */
 tracks.forEach((t,i)=>{
-  const div = document.createElement("div");
-  div.className = "card";
-  div.style.animationDelay = `${i*0.1}s`;
-
-  div.innerHTML = `
+  const div=document.createElement("div");
+  div.className="card";
+  div.innerHTML=`
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-    <button class="playBtnCard" onclick="load(${i})">▶ Play</button>
-    <button onclick="download(${i})">⬇ Скачать</button>
-  `;
+    <button onclick="load(${i})">▶ Play</button>
 
+    <div class="downloadBtn" onclick="download(${i})">
+      <div class="fill"></div>
+      <span>⬇ Скачать</span>
+    </div>
+  `;
   list.appendChild(div);
   cards.push(div);
-  cardButtons.push(div.querySelector(".playBtnCard"));
+  downloadLocks[i]=false;
 });
 
-/* SEARCH */
-search.addEventListener("input", () => {
-  const value = search.value.toLowerCase();
-
-  tracks.forEach((t,i)=>{
-    cards[i].style.display =
-      t.title.toLowerCase().includes(value) ? "block" : "none";
-  });
-});
-
-/* DOWNLOAD */
+/* ===== DOWNLOAD WITH REAL PROGRESS ===== */
 async function download(i){
-  const t = tracks[i];
+  if(downloadLocks[i]) return;
+  downloadLocks[i]=true;
 
-  const response = await fetch(t.file);
-  const blob = await response.blob();
+  const t=tracks[i];
+  const btn=cards[i].querySelector(".downloadBtn");
+  const fill=btn.querySelector(".fill");
+  const text=btn.querySelector("span");
 
-  const url = URL.createObjectURL(blob);
+  fill.style.width="0%";
+  text.textContent="0%";
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = t.title + ".mp3";
+  const res=await fetch(t.file);
+  const reader=res.body.getReader();
+  const total=+res.headers.get("Content-Length")||1;
 
+  let received=0;
+  let chunks=[];
+
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+
+    chunks.push(value);
+    received+=value.length;
+
+    let percent=Math.floor((received/total)*100);
+    fill.style.width=percent+"%";
+    text.textContent=percent+"%";
+  }
+
+  const blob=new Blob(chunks);
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=t.title+".mp3";
   document.body.appendChild(a);
   a.click();
-
   a.remove();
+
   URL.revokeObjectURL(url);
+
+  setTimeout(()=>{
+    fill.style.width="0%";
+    text.textContent="⬇ Скачать";
+    downloadLocks[i]=false;
+  },700);
 }
 
-function donate(){ window.open("https://paypal.me/yourlink","_blank"); }
-function ads(){ alert("Реклама здесь"); }
+function donate(){window.open("https://paypal.me/yourlink");}
+function ads(){alert("Реклама");}
+
+search.oninput=()=>{
+  const v=search.value.toLowerCase();
+  cards.forEach((c,i)=>{
+    c.style.display=tracks[i].title.toLowerCase().includes(v)?"block":"none";
+  });
+};
 
 </script>
-
 </body>
 </html>
