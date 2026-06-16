@@ -15,19 +15,31 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ================= CORE STATE FIX ================= */
+/* ===== PLAYER (collapse system) ===== */
+const player = document.getElementById("player");
+const togglePlayerBtn = document.getElementById("togglePlayer");
 
-function setPlaying(state){
-  if(state){
-    audio.play().catch(()=>{});
-  } else {
-    audio.pause();
+let isCollapsed = false;
+
+function setCollapsed(state){
+  isCollapsed = state;
+
+  if(player){
+    player.classList.toggle("collapsed", state);
   }
-  syncUI();
+
+  if(togglePlayerBtn){
+    togglePlayerBtn.textContent = state ? "▴" : "▾";
+  }
 }
 
-/* ================= LOAD ================= */
+/* ===== SAFE PLAY ===== */
+function safePlay(){
+  const p = audio.play();
+  if(p && p.catch) p.catch(()=>{});
+}
 
+/* ===== LOAD TRACK ===== */
 function load(i){
   current = i;
 
@@ -35,63 +47,69 @@ function load(i){
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
 
-  setPlaying(true);
+  safePlay();
+  syncUI();
 }
 
-/* ================= CARD CLICK FIX ================= */
-
+/* ===== TOGGLE TRACK ===== */
 function toggleTrack(i){
 
-  // другой трек
-  if(i !== current){
-    load(i);
+  if(i === current){
+    if(audio.paused){
+      safePlay();
+    } else {
+      audio.pause();
+    }
     return;
   }
 
-  // тот же трек
-  setPlaying(audio.paused);
+  load(i);
 }
 
-/* ================= MAIN BUTTON ================= */
-
+/* ===== MAIN PLAYER BUTTON ===== */
 function toggle(){
-  setPlaying(audio.paused);
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
 }
 
-/* ================= UI ================= */
-
+/* ===== UI SYNC (FIXED CORE) ===== */
 function syncUI(){
 
   const isPlaying = !audio.paused;
 
-  playBtn.textContent = isPlaying ? "⏸" : "▶️";
+  // главный плеер
+  if(playBtn){
+    playBtn.textContent = isPlaying ? "⏸" : "▶️";
+  }
 
+  // карточки
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
+    if(!btn) return;
 
     if(i === current){
       btn.textContent = isPlaying ? "⏸ Pause" : "▶ Play";
-      c.classList.add("active");
     } else {
       btn.textContent = "▶ Play";
-      c.classList.remove("active");
     }
+
+    c.classList.toggle("active", i === current);
   });
 }
 
-/* ================= EVENTS ================= */
-
+/* ===== EVENTS ===== */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
-
 audio.addEventListener("ended", () => {
   if(current >= 0){
     load((current + 1) % tracks.length);
   }
 });
 
-/* ================= PROGRESS ================= */
-
+/* ===== PROGRESS ===== */
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -102,8 +120,7 @@ progress.oninput = () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 };
 
-/* ================= CARDS ================= */
-
+/* ===== CARDS ===== */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -123,8 +140,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ================= DOWNLOAD ================= */
-
+/* ===== DOWNLOAD ===== */
 function downloadTrack(i){
   fetch(tracks[i].file)
     .then(r => r.blob())
@@ -142,8 +158,7 @@ function downloadTrack(i){
     });
 }
 
-/* ================= SEARCH ================= */
-
+/* ===== SEARCH ===== */
 searchInput.addEventListener("input", () => {
   const v = searchInput.value.toLowerCase();
 
@@ -152,4 +167,24 @@ searchInput.addEventListener("input", () => {
       ? "block"
       : "none";
   });
+});
+
+/* ===== SWIPE GESTURES ===== */
+let startY = 0;
+
+player.addEventListener("touchstart", (e) => {
+  startY = e.touches[0].clientY;
+});
+
+player.addEventListener("touchend", (e) => {
+  const endY = e.changedTouches[0].clientY;
+  const diff = endY - startY;
+
+  if(diff > 50){
+    setCollapsed(true);
+  }
+
+  if(diff < -50){
+    setCollapsed(false);
+  }
 });
