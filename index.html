@@ -37,7 +37,10 @@ body{
   width:200px;
 }
 
-/* LOGO FIX (главная проблема телефона) */
+/* side buttons */
+.side{ width:60px; display:flex; justify-content:center; }
+
+/* LOGO — FIXED (ключевая проблема телефонов) */
 .logo{
   display:flex;
   justify-content:center;
@@ -46,10 +49,14 @@ body{
 }
 
 .logo img{
-  width:100%;
-  max-width:420px;
+  width:auto;
   height:auto;
+
+  max-width: 90vw;
+  max-height: 420px;
+
   border-radius:16px;
+  display:block;
 }
 
 /* GRID */
@@ -171,8 +178,11 @@ button{
     width:100%;
   }
 
+  /* FIX LOGO MOBILE */
   .logo img{
-    max-width:90vw;
+    max-width: 90vw;
+    max-height: none;
+    width: 100%;
   }
 
   .container{
@@ -253,7 +263,7 @@ function safePlay(){
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* LOAD TRACK */
+/* LOAD */
 function load(i){
   current = i;
 
