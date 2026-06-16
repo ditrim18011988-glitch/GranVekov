@@ -15,13 +15,19 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ================= SAFE PLAY ================= */
-function safePlay(){
-  const p = audio.play();
-  if(p && p.catch) p.catch(()=>{});
+/* ================= CORE STATE FIX ================= */
+
+function setPlaying(state){
+  if(state){
+    audio.play().catch(()=>{});
+  } else {
+    audio.pause();
+  }
+  syncUI();
 }
 
-/* ================= LOAD TRACK ================= */
+/* ================= LOAD ================= */
+
 function load(i){
   current = i;
 
@@ -29,11 +35,11 @@ function load(i){
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
 
-  safePlay();
-  syncUI();
+  setPlaying(true);
 }
 
-/* ================= CARD CLICK ================= */
+/* ================= CARD CLICK FIX ================= */
+
 function toggleTrack(i){
 
   // другой трек
@@ -42,28 +48,18 @@ function toggleTrack(i){
     return;
   }
 
-  // тот же трек → play/pause
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
-
-  syncUI();
+  // тот же трек
+  setPlaying(audio.paused);
 }
 
-/* ================= PLAYER BUTTON ================= */
+/* ================= MAIN BUTTON ================= */
+
 function toggle(){
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
-
-  syncUI();
+  setPlaying(audio.paused);
 }
 
-/* ================= UI SYNC ================= */
+/* ================= UI ================= */
+
 function syncUI(){
 
   const isPlaying = !audio.paused;
@@ -72,19 +68,19 @@ function syncUI(){
 
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
-    if(!btn) return;
 
     if(i === current){
       btn.textContent = isPlaying ? "⏸ Pause" : "▶ Play";
+      c.classList.add("active");
     } else {
       btn.textContent = "▶ Play";
+      c.classList.remove("active");
     }
-
-    c.classList.toggle("active", i === current);
   });
 }
 
 /* ================= EVENTS ================= */
+
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 
@@ -95,6 +91,7 @@ audio.addEventListener("ended", () => {
 });
 
 /* ================= PROGRESS ================= */
+
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -106,6 +103,7 @@ progress.oninput = () => {
 };
 
 /* ================= CARDS ================= */
+
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -113,7 +111,6 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-
     <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
@@ -126,18 +123,17 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ================= DOWNLOAD (ВОЗВРАТ НОРМАЛЬНОЙ ВЕРСИИ) ================= */
-function downloadTrack(i){
-  const t = tracks[i];
+/* ================= DOWNLOAD ================= */
 
-  fetch(t.file)
+function downloadTrack(i){
+  fetch(tracks[i].file)
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = t.title + ".mp3";
+      a.download = tracks[i].title + ".mp3";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -147,6 +143,7 @@ function downloadTrack(i){
 }
 
 /* ================= SEARCH ================= */
+
 searchInput.addEventListener("input", () => {
   const v = searchInput.value.toLowerCase();
 
