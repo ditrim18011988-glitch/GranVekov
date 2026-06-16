@@ -18,19 +18,21 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ===== ACTIVE ===== */
+/* ===== ACTIVE TRACK ===== */
 function setActiveTrack(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== BUTTON SYNC ===== */
+/* ===== SYNC BUTTONS ===== */
 function updateCardButtons(){
   cardPlayButtons.forEach((btn, i) => {
     if(!btn) return;
-    btn.innerText = (i === current && !audio.paused)
-      ? "⏸ Playing"
-      : "▶ Play";
+
+    btn.innerText =
+      (i === current && !audio.paused)
+        ? "⏸ Playing"
+        : "▶ Play";
   });
 }
 
@@ -49,20 +51,26 @@ function load(i){
   updateCardButtons();
 }
 
-/* ===== CONTROLS ===== */
-function next(){ load((current + 1) % tracks.length); }
-function prev(){ load((current - 1 + tracks.length) % tracks.length); }
-
+/* ===== PLAY / PAUSE ===== */
 function toggle(){
   if(audio.paused){
     audio.play();
-    playBtn.innerText = "⏸";
   } else {
     audio.pause();
-    playBtn.innerText = "▶️";
   }
+
+  playBtn.innerText = audio.paused ? "▶️" : "⏸";
   updateCardButtons();
 }
+
+/* ===== NEXT / PREV ===== */
+function next(){ load((current + 1) % tracks.length); }
+function prev(){ load((current - 1 + tracks.length) % tracks.length); }
+
+/* ===== AUDIO EVENTS (ВАЖНО) ===== */
+audio.addEventListener("play", updateCardButtons);
+audio.addEventListener("pause", updateCardButtons);
+audio.addEventListener("ended", next);
 
 /* ===== PROGRESS ===== */
 audio.ontimeupdate = () => {
@@ -76,8 +84,6 @@ progress.oninput = () => {
     audio.currentTime = (progress.value / 100) * audio.duration;
   }
 };
-
-audio.onended = next;
 
 /* ===== CARDS ===== */
 tracks.forEach((t, i) => {
@@ -102,7 +108,7 @@ tracks.forEach((t, i) => {
   cardPlayButtons.push(div.querySelector(".playCardBtn"));
 });
 
-/* ===== DOWNLOAD (STABLE VERSION) ===== */
+/* ===== DOWNLOAD (STABLE + SAFE) ===== */
 function download(i){
   if(isDownloading) return;
 
@@ -111,7 +117,6 @@ function download(i){
   const fill = bar.querySelector(".download-fill");
   const text = bar.querySelector("span");
 
-  /* если уже идёт загрузка — сбросить */
   if(activeXHR){
     activeXHR.abort();
     activeXHR = null;
@@ -143,7 +148,6 @@ function download(i){
     const a = document.createElement("a");
     a.href = url;
     a.download = t.title + ".mp3";
-
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -165,7 +169,7 @@ function download(i){
   xhr.send();
 }
 
-/* ===== RESET DOWNLOAD STATE ===== */
+/* ===== RESET DOWNLOAD ===== */
 function resetDownload(bar, fill, text){
   setTimeout(() => {
     fill.style.width = "0%";
@@ -190,11 +194,4 @@ searchInput.addEventListener("input", () => {
   });
 
   list.style.opacity = (!found && value.length > 0) ? "0.5" : "1";
-});
-
-/* ===== BUTTON FX ===== */
-document.querySelectorAll("button").forEach(btn => {
-  btn.addEventListener("mousedown", () => btn.style.transform = "scale(0.92)");
-  btn.addEventListener("mouseup", () => btn.style.transform = "");
-  btn.addEventListener("mouseleave", () => btn.style.transform = "");
 });
