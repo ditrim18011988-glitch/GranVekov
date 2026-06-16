@@ -1,25 +1,14 @@
 const tracks = [
-  {
-    title: "Чёрная лампа",
-    file: "music/track1.mp3",
-    cover: "music/cover1.jpg"
-  },
-  {
-    title: "Всадники Ада",
-    file: "music/track2.mp3",
-    cover: "music/cover2.jpg"
-  },
-  {
-    title: "Чёрное рождество",
-    file: "music/track3.mp3",
-    cover: "music/cover3.png"
-  }
+  { title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg" },
+  { title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg" },
+  { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.png" }
 ];
 
 let current = 0;
 let cards = [];
 let cardPlayButtons = [];
 let isDownloading = false;
+let activeXHR = null;
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
@@ -29,22 +18,24 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ===== ACTIVE TRACK ===== */
-function setActiveTrack(index) {
+/* ===== ACTIVE ===== */
+function setActiveTrack(i){
   cards.forEach(c => c.classList.remove("active"));
-  if (cards[index]) cards[index].classList.add("active");
+  if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== CARD BUTTON SYNC ===== */
-function updateCardButtons(activeIndex, isPlaying) {
+/* ===== BUTTON SYNC ===== */
+function updateCardButtons(){
   cardPlayButtons.forEach((btn, i) => {
-    if (!btn) return;
-    btn.innerText = (i === activeIndex && isPlaying) ? "⏸ Playing" : "▶ Play";
+    if(!btn) return;
+    btn.innerText = (i === current && !audio.paused)
+      ? "⏸ Playing"
+      : "▶ Play";
   });
 }
 
 /* ===== LOAD TRACK ===== */
-function load(i) {
+function load(i){
   current = i;
 
   audio.src = tracks[i].file;
@@ -55,47 +46,40 @@ function load(i) {
   playBtn.innerText = "⏸";
 
   setActiveTrack(i);
-  updateCardButtons(i, true);
+  updateCardButtons();
 }
 
-/* ===== NEXT / PREV ===== */
-function next() {
-  load((current + 1) % tracks.length);
-}
+/* ===== CONTROLS ===== */
+function next(){ load((current + 1) % tracks.length); }
+function prev(){ load((current - 1 + tracks.length) % tracks.length); }
 
-function prev() {
-  load((current - 1 + tracks.length) % tracks.length);
-}
-
-/* ===== TOGGLE PLAY ===== */
-function toggle() {
-  if (audio.paused) {
+function toggle(){
+  if(audio.paused){
     audio.play();
     playBtn.innerText = "⏸";
-    updateCardButtons(current, true);
   } else {
     audio.pause();
     playBtn.innerText = "▶️";
-    updateCardButtons(current, false);
   }
+  updateCardButtons();
 }
 
-/* ===== PLAYER PROGRESS ===== */
+/* ===== PROGRESS ===== */
 audio.ontimeupdate = () => {
-  if (audio.duration) {
+  if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
   }
 };
 
 progress.oninput = () => {
-  if (audio.duration) {
+  if(audio.duration){
     audio.currentTime = (progress.value / 100) * audio.duration;
   }
 };
 
 audio.onended = next;
 
-/* ===== CREATE CARDS ===== */
+/* ===== CARDS ===== */
 tracks.forEach((t, i) => {
   const div = document.createElement("div");
   div.className = "card";
@@ -118,18 +102,27 @@ tracks.forEach((t, i) => {
   cardPlayButtons.push(div.querySelector(".playCardBtn"));
 });
 
-/* ===== DOWNLOAD WITH PROGRESS ===== */
-function download(i) {
-  if (isDownloading) return; // защита от спама
+/* ===== DOWNLOAD (STABLE VERSION) ===== */
+function download(i){
+  if(isDownloading) return;
 
   const t = tracks[i];
   const bar = cards[i].querySelector(".download-bar");
   const fill = bar.querySelector(".download-fill");
   const text = bar.querySelector("span");
 
+  /* если уже идёт загрузка — сбросить */
+  if(activeXHR){
+    activeXHR.abort();
+    activeXHR = null;
+  }
+
   isDownloading = true;
+  bar.classList.add("loading");
 
   const xhr = new XMLHttpRequest();
+  activeXHR = xhr;
+
   xhr.open("GET", t.file, true);
   xhr.responseType = "blob";
 
@@ -137,7 +130,7 @@ function download(i) {
   text.innerText = "0%";
 
   xhr.onprogress = (e) => {
-    if (e.lengthComputable) {
+    if(e.lengthComputable){
       const percent = Math.floor((e.loaded / e.total) * 100);
       fill.style.width = percent + "%";
       text.innerText = percent + "%";
@@ -157,19 +150,31 @@ function download(i) {
 
     URL.revokeObjectURL(url);
 
-    setTimeout(() => {
-      fill.style.width = "0%";
-      text.innerText = "⬇ Скачать";
-      isDownloading = false;
-    }, 500);
+    resetDownload(bar, fill, text);
   };
 
   xhr.onerror = () => {
     text.innerText = "Ошибка";
-    isDownloading = false;
+    resetDownload(bar, fill, text);
+  };
+
+  xhr.onabort = () => {
+    resetDownload(bar, fill, text);
   };
 
   xhr.send();
+}
+
+/* ===== RESET DOWNLOAD STATE ===== */
+function resetDownload(bar, fill, text){
+  setTimeout(() => {
+    fill.style.width = "0%";
+    text.innerText = "⬇ Скачать";
+    bar.classList.remove("loading");
+
+    isDownloading = false;
+    activeXHR = null;
+  }, 400);
 }
 
 /* ===== SEARCH ===== */
@@ -181,13 +186,13 @@ searchInput.addEventListener("input", () => {
   tracks.forEach((t, i) => {
     const match = t.title.toLowerCase().includes(value);
     cards[i].style.display = match ? "block" : "none";
-    if (match) found = true;
+    if(match) found = true;
   });
 
   list.style.opacity = (!found && value.length > 0) ? "0.5" : "1";
 });
 
-/* ===== BUTTON EFFECTS ===== */
+/* ===== BUTTON FX ===== */
 document.querySelectorAll("button").forEach(btn => {
   btn.addEventListener("mousedown", () => btn.style.transform = "scale(0.92)");
   btn.addEventListener("mouseup", () => btn.style.transform = "");
