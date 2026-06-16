@@ -94,8 +94,11 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
+
   padding: 20px;
-  padding-bottom: 140px;
+
+  /* 🔥 ВАЖНЕЙШИЙ ФИКС */
+  padding-bottom: 220px;
 }
 
 /* CARD */
@@ -110,49 +113,21 @@ body {
 
   transition: 0.25s ease;
   box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-
   cursor: pointer;
   position: relative;
   overflow: hidden;
 }
 
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(255,60,60,0.15), transparent 60%);
-  opacity: 0;
-  transition: 0.3s;
-}
-
 .card:hover {
   transform: translateY(-10px) scale(1.04);
-  box-shadow: 0 0 30px rgba(255,60,60,0.25),
-              0 25px 60px rgba(0,0,0,0.7);
-}
-
-.card:hover::before {
-  opacity: 1;
 }
 
 .card.active {
   border: 1px solid #ff3c3c;
-  box-shadow: 0 0 35px rgba(255,60,60,0.4),
-              0 25px 60px rgba(0,0,0,0.7);
-  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 0 35px rgba(255,60,60,0.4);
 }
 
-.card img {
-  width: 100%;
-  border-radius: 12px;
-  transition: 0.3s ease;
-}
-
-.card:hover img {
-  transform: scale(1.05);
-}
-
-/* FADE IN */
+/* FADE */
 @keyframes fadeIn {
   to {
     opacity: 1;
@@ -160,83 +135,24 @@ body {
   }
 }
 
-/* PLAYER */
-#player {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  padding: 12px 18px;
-  background: rgba(10,10,18,0.9);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-#cover {
-  width: 58px;
-  height: 58px;
-  border-radius: 10px;
-}
-
-/* CONTROLS */
-.controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.controls button {
-  background: #222236;
-  padding: 7px 12px;
-  border: none;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.controls button:hover {
-  background: #2f2f4a;
-  transform: scale(1.05);
-}
-
-/* PROGRESS */
-#progress {
+.card img {
   width: 100%;
-  height: 4px;
-  background: #2a2a2a;
-  border-radius: 5px;
-  outline: none;
+  border-radius: 12px;
 }
 
-#progress::-webkit-slider-thumb {
-  width: 10px;
-  height: 10px;
+/* BUTTON */
+button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
   background: #ff3c3c;
-  border-radius: 50%;
+  color: white;
   cursor: pointer;
 }
 
-/* BUTTON FX */
-button {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(255, 60, 60, 0.25);
-}
-
-button:active {
-  transform: scale(0.92);
-}
-
-/* DOWNLOAD BAR */
+/* DOWNLOAD */
 .download-bar {
   position: relative;
   height: 38px;
@@ -250,9 +166,6 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 14px;
-  color: white;
 }
 
 .download-fill {
@@ -261,11 +174,8 @@ button:active {
   top: 0;
   height: 100%;
   width: 0%;
-
   background: linear-gradient(90deg, #ff3c3c, #ff7a7a);
   transition: width 0.1s linear;
-
-  z-index: 1;
 }
 
 .download-bar span {
@@ -273,35 +183,62 @@ button:active {
   z-index: 2;
 }
 
-.download-bar.loading {
-  opacity: 0.95;
-  box-shadow: 0 0 15px rgba(255, 60, 60, 0.25);
+/* PLAYER 🔥 FIX */
+#player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 12px 18px;
+  background: rgba(10,10,18,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.06);
+
+  /* 🔥 КЛЮЧЕВОЙ ФИКС */
+  min-height: 90px;
+  box-sizing: border-box;
+  z-index: 999;
 }
 
-/* ========================= */
-/* MOBILE FIX (REAL WORKING) */
-/* ========================= */
+#cover {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+}
 
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.controls button {
+  background: #222236;
+  padding: 7px 12px;
+  border-radius: 10px;
+}
+
+/* PROGRESS */
+#progress {
+  width: 100%;
+  height: 4px;
+}
+
+/* ================= MOBILE ================= */
 @media (max-width: 768px) {
 
   .topbar {
-    padding: 10px 12px;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 8px;
   }
 
   #search {
-    width: 120px;
-    font-size: 13px;
-  }
-
-  .actions button {
-    padding: 6px 10px;
-    font-size: 13px;
-  }
-
-  .logo {
-    margin: 20px 0;
+    width: 100%;
   }
 
   .logo img {
@@ -312,18 +249,16 @@ button:active {
 
   .container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
     padding: 10px;
-  }
 
-  .card {
-    padding: 10px;
+    /* 🔥 ещё больше место под плеер */
+    padding-bottom: 260px;
   }
 
   #player {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    min-height: 110px;
     padding: 10px;
   }
 
