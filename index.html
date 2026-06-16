@@ -16,7 +16,6 @@ body{
   cursor: url("music/rock-cursor.png"), auto;
 }
 
-/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -58,7 +57,6 @@ body{
   padding-bottom:120px;
 }
 
-/* CARD */
 .card {
   background:#1a1a25;
   border-radius:16px;
@@ -93,7 +91,6 @@ button{
   cursor:pointer;
 }
 
-/* DOWNLOAD */
 .downloadBtn{
   position:relative;
   overflow:hidden;
@@ -122,7 +119,6 @@ button{
   z-index:2;
 }
 
-/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -191,7 +187,12 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 
-/* ===== LOAD ===== */
+/* ===== STATE FIX ===== */
+function isPlaying(){
+  return !audio.paused;
+}
+
+/* ===== LOAD (FIXED) ===== */
 function load(i){
   current = i;
 
@@ -200,36 +201,40 @@ function load(i){
   cover.src = tracks[i].cover;
 
   audio.play();
-  playBtn.textContent = "⏸";
 
   setActive(i);
-  updateButtons();
+  syncUI();
 }
 
-/* ===== ACTIVE CARD ===== */
+/* ===== ACTIVE ===== */
 function setActive(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== SYNC BUTTONS ===== */
-function updateButtons(){
+/* ===== UI SYNC (FIXED CORE) ===== */
+function syncUI(){
+  playBtn.textContent = isPlaying() ? "⏸" : "▶️";
+
   cards.forEach((c,i)=>{
     const btn = c.querySelector(".cardPlay");
-    btn.textContent = (i === current && !audio.paused) ? "⏸ Playing" : "▶ Play";
+    if(btn){
+      btn.textContent =
+        (i === current && isPlaying())
+        ? "⏸ Playing"
+        : "▶ Play";
+    }
   });
 }
 
-/* ===== PLAY/PAUSE ===== */
+/* ===== TOGGLE (FIXED) ===== */
 function toggle(){
   if(audio.paused){
     audio.play();
-    playBtn.textContent = "⏸";
   }else{
     audio.pause();
-    playBtn.textContent = "▶️";
   }
-  updateButtons();
+  syncUI();
 }
 
 /* ===== NEXT / PREV ===== */
@@ -270,7 +275,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD (СТАБИЛЬНЫЙ) ===== */
+/* ===== DOWNLOAD (UNCHANGED, SAFE) ===== */
 function downloadTrack(i){
   const t = tracks[i];
   const btn = cards[i].querySelector(".downloadBtn");
@@ -299,7 +304,7 @@ function downloadTrack(i){
         text.textContent = "⬇ Скачать";
       },800);
     });
-}
+};
 
 /* ===== SEARCH ===== */
 search.oninput = () => {
