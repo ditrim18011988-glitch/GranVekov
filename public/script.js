@@ -33,16 +33,16 @@ function load(i){
   syncUI();
 }
 
-/* ================= TOGGLE TRACK ================= */
+/* ================= CARD CLICK ================= */
 function toggleTrack(i){
 
-  // если другой трек
+  // другой трек
   if(i !== current){
     load(i);
     return;
   }
 
-  // если тот же трек — нормальный toggle
+  // тот же трек → play/pause
   if(audio.paused){
     safePlay();
   } else {
@@ -52,7 +52,7 @@ function toggleTrack(i){
   syncUI();
 }
 
-/* ================= MAIN PLAYER BUTTON ================= */
+/* ================= PLAYER BUTTON ================= */
 function toggle(){
   if(audio.paused){
     safePlay();
@@ -63,27 +63,24 @@ function toggle(){
   syncUI();
 }
 
-/* ================= UI SYNC (ФИКС ВСЕХ БАГОВ) ================= */
+/* ================= UI SYNC ================= */
 function syncUI(){
 
   const isPlaying = !audio.paused;
 
-  // главный плеер
-  if(playBtn){
-    playBtn.textContent = isPlaying ? "⏸" : "▶️";
-  }
+  playBtn.textContent = isPlaying ? "⏸" : "▶️";
 
-  // карточки
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
+    if(!btn) return;
 
     if(i === current){
       btn.textContent = isPlaying ? "⏸ Pause" : "▶ Play";
-      c.classList.add("active");
     } else {
       btn.textContent = "▶ Play";
-      c.classList.remove("active");
     }
+
+    c.classList.toggle("active", i === current);
   });
 }
 
@@ -129,16 +126,18 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ================= DOWNLOAD (НЕ ТРОГАЕМ, ОН НОРМ) ================= */
+/* ================= DOWNLOAD (ВОЗВРАТ НОРМАЛЬНОЙ ВЕРСИИ) ================= */
 function downloadTrack(i){
-  fetch(tracks[i].file)
+  const t = tracks[i];
+
+  fetch(t.file)
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = tracks[i].title + ".mp3";
+      a.download = t.title + ".mp3";
       document.body.appendChild(a);
       a.click();
       a.remove();
