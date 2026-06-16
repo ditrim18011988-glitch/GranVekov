@@ -59,7 +59,6 @@ body{
   border-radius:16px;
 }
 
-/* GRID */
 .container{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
@@ -68,16 +67,13 @@ body{
   padding-bottom:120px;
 }
 
-/* CARD */
 .card {
   background:#1a1a25;
   border-radius:16px;
   padding:12px;
-
   opacity: 0;
   transform: translateY(12px);
   animation: fadeIn 0.5s ease forwards;
-
   transition: 0.25s ease;
 }
 
@@ -88,10 +84,7 @@ body{
 }
 
 @keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .card img{
@@ -110,7 +103,6 @@ button{
   cursor:pointer;
 }
 
-/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -154,7 +146,7 @@ button{
 </div>
 
 <div class="logo">
-  <img src="music/logo.png" alt="logo">
+  <img src="music/logo.png">
 </div>
 
 <div class="container" id="list"></div>
@@ -196,13 +188,22 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 
-/* ACTIVE */
 function setActiveTrack(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* LOAD */
+/* 🔥 ГЛАВНАЯ ФИКСИРОВАННАЯ ЛОГИКА */
+function updateCardButtons(){
+  cardButtons.forEach((btn, i) => {
+    if(i === current && !audio.paused){
+      btn.innerText = "⏸ Playing";
+    } else {
+      btn.innerText = "▶ Play";
+    }
+  });
+}
+
 function load(i){
   current = i;
 
@@ -215,15 +216,6 @@ function load(i){
 
   setActiveTrack(i);
   updateCardButtons();
-}
-
-/* обновление кнопок карточек */
-function updateCardButtons(){
-  cardButtons.forEach((btn, i) => {
-    btn.innerText = (i === current && !audio.paused)
-      ? "⏸ Playing"
-      : "▶ Play";
-  });
 }
 
 function next(){ load((current+1)%tracks.length); }
@@ -240,7 +232,6 @@ function toggle(){
   updateCardButtons();
 }
 
-/* PROGRESS */
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -276,8 +267,8 @@ search.addEventListener("input", () => {
   const value = search.value.toLowerCase();
 
   tracks.forEach((t,i)=>{
-    const match = t.title.toLowerCase().includes(value);
-    cards[i].style.display = match ? "block" : "none";
+    cards[i].style.display =
+      t.title.toLowerCase().includes(value) ? "block" : "none";
   });
 });
 
@@ -301,13 +292,9 @@ async function download(i){
   URL.revokeObjectURL(url);
 }
 
-function donate(){
-  window.open("https://paypal.me/yourlink","_blank");
-}
+function donate(){ window.open("https://paypal.me/yourlink","_blank"); }
+function ads(){ alert("Реклама здесь"); }
 
-function ads(){
-  alert("Реклама здесь");
-}
 </script>
 
 </body>
