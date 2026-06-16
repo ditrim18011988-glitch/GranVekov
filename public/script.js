@@ -1,7 +1,17 @@
 const tracks = [
   { title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg" },
   { title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg" },
-  { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.png" }
+  { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg" },
+  {title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg" },
+  {title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg" },
+  {title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg" },
+  {title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg" },
+  {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg" },
+  {title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg" },
+  {title:"Питер Пэн-похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg" },
+  {title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg" },
+  {title:"Безмолвный город", file:"music/track12.mp3", cover:"music/cover13.jpg" },
+  {title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg" }
 ];
 
 let current = -1;
