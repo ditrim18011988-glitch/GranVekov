@@ -23,20 +23,17 @@ let isCollapsed = false;
 
 function setCollapsed(state){
   isCollapsed = state;
-  player.classList.toggle("collapsed", state);
+
+  if(player){
+    player.classList.toggle("collapsed", state);
+  }
+
   if(togglePlayerBtn){
     togglePlayerBtn.textContent = state ? "▴" : "▾";
   }
 }
 
-/* toggle button */
-if(togglePlayerBtn){
-  togglePlayerBtn.addEventListener("click", () => {
-    setCollapsed(!isCollapsed);
-  });
-}
-
-/* ===== PLAY SAFE ===== */
+/* ===== SAFE PLAY ===== */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
@@ -58,44 +55,58 @@ function load(i){
 function toggleTrack(i){
 
   if(i === current){
-    if(audio.paused) safePlay();
-    else audio.pause();
+    if(audio.paused){
+      safePlay();
+    } else {
+      audio.pause();
+    }
     return;
   }
 
   load(i);
 }
 
-/* ===== MAIN BUTTON ===== */
+/* ===== MAIN PLAYER BUTTON ===== */
 function toggle(){
-  if(audio.paused) safePlay();
-  else audio.pause();
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
 }
 
-/* ===== UI ===== */
+/* ===== UI SYNC (FIXED CORE) ===== */
 function syncUI(){
-  playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
+  const isPlaying = !audio.paused;
+
+  // главный плеер
+  if(playBtn){
+    playBtn.textContent = isPlaying ? "⏸" : "▶️";
+  }
+
+  // карточки
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
+    if(!btn) return;
 
     if(i === current){
-      btn.textContent = audio.paused ? "▶ Play" : "⏸ Pause";
+      btn.textContent = isPlaying ? "⏸ Pause" : "▶ Play";
     } else {
       btn.textContent = "▶ Play";
     }
 
-    c.classList.remove("active");
-    if(i === current) c.classList.add("active");
+    c.classList.toggle("active", i === current);
   });
 }
 
 /* ===== EVENTS ===== */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
-
 audio.addEventListener("ended", () => {
-  if(current >= 0) load((current + 1) % tracks.length);
+  if(current >= 0){
+    load((current + 1) % tracks.length);
+  }
 });
 
 /* ===== PROGRESS ===== */
@@ -135,12 +146,14 @@ function downloadTrack(i){
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement("a");
       a.href = url;
       a.download = tracks[i].title + ".mp3";
       document.body.appendChild(a);
       a.click();
       a.remove();
+
       URL.revokeObjectURL(url);
     });
 }
@@ -150,7 +163,9 @@ searchInput.addEventListener("input", () => {
   const v = searchInput.value.toLowerCase();
 
   cards.forEach((c,i)=>{
-    c.style.display = tracks[i].title.toLowerCase().includes(v) ? "block" : "none";
+    c.style.display = tracks[i].title.toLowerCase().includes(v)
+      ? "block"
+      : "none";
   });
 });
 
@@ -165,12 +180,10 @@ player.addEventListener("touchend", (e) => {
   const endY = e.changedTouches[0].clientY;
   const diff = endY - startY;
 
-  // свайп вниз → свернуть
   if(diff > 50){
     setCollapsed(true);
   }
 
-  // свайп вверх → развернуть
   if(diff < -50){
     setCollapsed(false);
   }
