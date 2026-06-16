@@ -16,6 +16,7 @@ body{
   cursor: url("music/rock-cursor.png"), auto;
 }
 
+/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -25,6 +26,7 @@ body{
   gap:10px;
 }
 
+/* SEARCH */
 #search{
   padding:8px 12px;
   border-radius:10px;
@@ -35,20 +37,22 @@ body{
   width:200px;
 }
 
-.side{ width:60px; display:flex; justify-content:center; }
-
+/* LOGO FIX (главная проблема телефона) */
 .logo{
   display:flex;
   justify-content:center;
-  margin:40px 0;
+  margin:30px 0;
+  padding:0 10px;
 }
 
 .logo img{
-  height:420px;
-  max-width:95vw;
+  width:100%;
+  max-width:420px;
+  height:auto;
   border-radius:16px;
 }
 
+/* GRID */
 .container{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
@@ -57,7 +61,8 @@ body{
   padding-bottom:120px;
 }
 
-.card {
+/* CARD */
+.card{
   background:#1a1a25;
   border-radius:16px;
   padding:12px;
@@ -80,6 +85,7 @@ body{
   border-radius:12px;
 }
 
+/* BUTTON */
 button{
   width:100%;
   margin-top:8px;
@@ -91,6 +97,7 @@ button{
   cursor:pointer;
 }
 
+/* DOWNLOAD */
 .downloadBtn{
   position:relative;
   overflow:hidden;
@@ -119,6 +126,7 @@ button{
   z-index:2;
 }
 
+/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -128,12 +136,65 @@ button{
   padding:10px;
   display:flex;
   gap:10px;
+  align-items:center;
 }
 
-#cover{ width:50px; height:50px; border-radius:8px; }
+#cover{
+  width:50px;
+  height:50px;
+  border-radius:8px;
+}
 
-.controls{ display:flex; gap:5px; }
-.controls button{ width:auto; }
+.controls{
+  display:flex;
+  gap:5px;
+}
+
+.controls button{
+  width:auto;
+}
+
+/* PROGRESS */
+#progress{
+  width:100%;
+}
+
+/* ================= MOBILE FIX ================= */
+@media (max-width: 600px){
+
+  .topbar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  #search{
+    width:100%;
+  }
+
+  .logo img{
+    max-width:90vw;
+  }
+
+  .container{
+    grid-template-columns: repeat(2, 1fr);
+    gap:12px;
+    padding:12px;
+  }
+
+  #player{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  #cover{
+    width:40px;
+    height:40px;
+  }
+
+  .controls{
+    justify-content:space-between;
+  }
+}
 </style>
 </head>
 
@@ -186,13 +247,13 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 
-/* ===== SAFE PLAY ===== */
+/* SAFE PLAY */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* ===== LOAD TRACK ===== */
+/* LOAD TRACK */
 function load(i){
   current = i;
 
@@ -205,31 +266,20 @@ function load(i){
   syncUI();
 }
 
-/* ===== ACTIVE CARD ===== */
+/* ACTIVE */
 function setActive(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== TOGGLE FROM CARD (FIX) ===== */
-function toggleCard(i){
-  if(i === current){
-    if(audio.paused) safePlay();
-    else audio.pause();
-  } else {
-    load(i);
-  }
-  syncUI();
-}
-
-/* ===== PLAYER TOGGLE ===== */
+/* TOGGLE */
 function toggle(){
   if(audio.paused) safePlay();
   else audio.pause();
   syncUI();
 }
 
-/* ===== SYNC UI ===== */
+/* SYNC UI */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
@@ -244,16 +294,16 @@ function syncUI(){
   });
 }
 
-/* ===== NEXT / PREV ===== */
+/* NEXT / PREV */
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* ===== EVENTS ===== */
+/* EVENTS */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 audio.addEventListener("ended", next);
 
-/* ===== PROGRESS ===== */
+/* PROGRESS */
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime/audio.duration)*100;
@@ -264,7 +314,7 @@ progress.oninput = () => {
   audio.currentTime = (progress.value/100)*audio.duration;
 };
 
-/* ===== CARDS ===== */
+/* CARDS */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -272,7 +322,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-    <button onclick="toggleCard(${i})">▶ Play</button>
+    <button onclick="load(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -284,7 +334,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD ===== */
+/* DOWNLOAD */
 function downloadTrack(i){
   const t = tracks[i];
   const btn = cards[i].querySelector(".downloadBtn");
@@ -315,7 +365,7 @@ function downloadTrack(i){
     });
 }
 
-/* ===== SEARCH ===== */
+/* SEARCH */
 search.oninput = () => {
   const v = search.value.toLowerCase();
   cards.forEach((c,i)=>{
@@ -323,7 +373,7 @@ search.oninput = () => {
   });
 };
 
-/* ===== EXTRA ===== */
+/* EXTRA */
 function donate(){ window.open("https://paypal.me/yourlink"); }
 function ads(){ alert("Реклама"); }
 
