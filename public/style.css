@@ -24,6 +24,26 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
+/* 🔍 SEARCH */
+#search {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+
+  background: #1b1b2a;
+  color: white;
+
+  width: 220px;
+  transition: 0.2s;
+}
+
+#search:focus {
+  box-shadow: 0 0 15px rgba(255,60,60,0.4);
+  transform: scale(1.03);
+}
+
+/* buttons */
 .actions {
   display: flex;
   gap: 10px;
@@ -85,6 +105,8 @@ body {
   gap: 20px;
   padding: 20px;
   padding-bottom: 140px;
+
+  transition: 0.3s;
 }
 
 /* CARD */
@@ -127,7 +149,7 @@ body {
   opacity: 1;
 }
 
-/* 🔥 АКТИВНЫЙ ТРЕК */
+/* ACTIVE TRACK */
 .card.active {
   border: 1px solid #ff3c3c;
   box-shadow:
@@ -233,5 +255,9 @@ body {
 @media (max-width: 600px) {
   .logo img {
     height: 260px !important;
+  }
+
+  #search {
+    width: 140px;
   }
 }
