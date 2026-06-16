@@ -18,6 +18,7 @@ const tracks = [
 
 let current = 0;
 let cards = [];
+let cardPlayButtons = [];
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
@@ -33,6 +34,19 @@ function setActiveTrack(index) {
   if (cards[index]) cards[index].classList.add("active");
 }
 
+/* ===== ОБНОВЛЕНИЕ КНОПОК ===== */
+function updateCardButtons(activeIndex, isPlaying) {
+  cardPlayButtons.forEach((btn, i) => {
+    if (!btn) return;
+
+    if (i === activeIndex) {
+      btn.innerText = isPlaying ? "⏸ Playing" : "▶ Play";
+    } else {
+      btn.innerText = "▶ Play";
+    }
+  });
+}
+
 /* ===== ЗАГРУЗКА ТРЕКА ===== */
 function load(i) {
   current = i;
@@ -45,6 +59,7 @@ function load(i) {
   playBtn.innerText = "⏸";
 
   setActiveTrack(i);
+  updateCardButtons(i, true);
 }
 
 /* ===== NEXT / PREV ===== */
@@ -61,9 +76,11 @@ function toggle() {
   if (audio.paused) {
     audio.play();
     playBtn.innerText = "⏸";
+    updateCardButtons(current, true);
   } else {
     audio.pause();
     playBtn.innerText = "▶️";
+    updateCardButtons(current, false);
   }
 }
 
@@ -92,9 +109,9 @@ tracks.forEach((t, i) => {
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
-    <button onclick="load(${i})">▶ Play</button>
+    <button class="playCardBtn" onclick="load(${i})">▶ Play</button>
 
-    <div class="download-bar" id="dl-${i}" onclick="download(${i})">
+    <div class="download-bar" onclick="download(${i})">
       <div class="download-fill"></div>
       <span>⬇ Скачать</span>
     </div>
@@ -102,24 +119,31 @@ tracks.forEach((t, i) => {
 
   list.appendChild(div);
   cards.push(div);
+
+  cardPlayButtons.push(div.querySelector(".playCardBtn"));
 });
 
 /* ===== СКАЧИВАНИЕ С ПРОГРЕССОМ ===== */
 function download(i) {
   const t = tracks[i];
-  const bar = document.getElementById(`dl-${i}`);
+  const bar = cards[i].querySelector(".download-bar");
   const fill = bar.querySelector(".download-fill");
+  const text = bar.querySelector("span");
 
   const xhr = new XMLHttpRequest();
   xhr.open("GET", t.file, true);
   xhr.responseType = "blob";
 
   fill.style.width = "0%";
+  text.innerText = "0%";
+
   bar.classList.add("loading");
 
   xhr.onprogress = (e) => {
     if (e.lengthComputable) {
-      fill.style.width = (e.loaded / e.total) * 100 + "%";
+      const percent = Math.floor((e.loaded / e.total) * 100);
+      fill.style.width = percent + "%";
+      text.innerText = percent + "%";
     }
   };
 
@@ -136,8 +160,11 @@ function download(i) {
 
     URL.revokeObjectURL(url);
 
-    fill.style.width = "0%";
-    bar.classList.remove("loading");
+    setTimeout(() => {
+      fill.style.width = "0%";
+      text.innerText = "⬇ Скачать";
+      bar.classList.remove("loading");
+    }, 600);
   };
 
   xhr.send();
@@ -152,9 +179,7 @@ searchInput.addEventListener("input", () => {
   tracks.forEach((t, i) => {
     const match = t.title.toLowerCase().includes(value);
 
-    if (cards[i]) {
-      cards[i].style.display = match ? "block" : "none";
-    }
+    cards[i].style.display = match ? "block" : "none";
 
     if (match) found = true;
   });
@@ -162,7 +187,7 @@ searchInput.addEventListener("input", () => {
   list.style.opacity = (!found && value.length > 0) ? "0.5" : "1";
 });
 
-/* ===== КНОПКИ ЭФФЕКТ ===== */
+/* ===== ЭФФЕКТ КНОПОК ===== */
 document.querySelectorAll("button").forEach(btn => {
   btn.addEventListener("mousedown", () => {
     btn.style.transform = "scale(0.92)";
