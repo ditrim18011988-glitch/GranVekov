@@ -134,7 +134,6 @@ button{
 
 .controls{ display:flex; gap:5px; }
 .controls button{ width:auto; }
-
 </style>
 </head>
 
@@ -187,12 +186,28 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 
-/* ===== STATE FIX ===== */
-function isPlaying(){
-  return !audio.paused;
+/* ===== ACTIVE ===== */
+function setActive(i){
+  cards.forEach(c => c.classList.remove("active"));
+  if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== LOAD (FIXED) ===== */
+/* ===== SYNC UI ===== */
+function syncUI(){
+  playBtn.textContent = audio.paused ? "▶️" : "⏸";
+
+  cards.forEach((c,i)=>{
+    const btn = c.querySelector(".cardPlay");
+    if(!btn) return;
+
+    btn.textContent =
+      (i === current && !audio.paused)
+      ? "⏸ Pause"
+      : "▶ Play";
+  });
+}
+
+/* ===== LOAD TRACK ===== */
 function load(i){
   current = i;
 
@@ -206,40 +221,38 @@ function load(i){
   syncUI();
 }
 
-/* ===== ACTIVE ===== */
-function setActive(i){
-  cards.forEach(c => c.classList.remove("active"));
-  if(cards[i]) cards[i].classList.add("active");
-}
-
-/* ===== UI SYNC (FIXED CORE) ===== */
-function syncUI(){
-  playBtn.textContent = isPlaying() ? "⏸" : "▶️";
-
-  cards.forEach((c,i)=>{
-    const btn = c.querySelector(".cardPlay");
-    if(btn){
-      btn.textContent =
-        (i === current && isPlaying())
-        ? "⏸ Playing"
-        : "▶ Play";
+/* ===== CARD TOGGLE (ВОТ ГЛАВНОЕ ИСПРАВЛЕНИЕ) ===== */
+function toggleCard(i){
+  if(current === i){
+    // тот же трек → пауза/плей
+    if(audio.paused){
+      audio.play();
+    } else {
+      audio.pause();
     }
-  });
+  } else {
+    // новый трек
+    load(i);
+  }
+
+  syncUI();
 }
 
-/* ===== TOGGLE (FIXED) ===== */
+/* ===== PLAYER TOGGLE ===== */
 function toggle(){
-  if(audio.paused){
-    audio.play();
-  }else{
-    audio.pause();
-  }
+  if(audio.paused) audio.play();
+  else audio.pause();
   syncUI();
 }
 
 /* ===== NEXT / PREV ===== */
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
+
+/* ===== EVENTS ===== */
+audio.addEventListener("play", syncUI);
+audio.addEventListener("pause", syncUI);
+audio.addEventListener("ended", next);
 
 /* ===== PROGRESS ===== */
 audio.ontimeupdate = () => {
@@ -252,8 +265,6 @@ progress.oninput = () => {
   audio.currentTime = (progress.value/100)*audio.duration;
 };
 
-audio.onended = next;
-
 /* ===== CARDS ===== */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
@@ -263,7 +274,7 @@ tracks.forEach((t,i)=>{
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
-    <button class="cardPlay" onclick="load(${i})">▶ Play</button>
+    <button class="cardPlay" onclick="toggleCard(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -275,7 +286,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD (UNCHANGED, SAFE) ===== */
+/* ===== DOWNLOAD (без изменений) ===== */
 function downloadTrack(i){
   const t = tracks[i];
   const btn = cards[i].querySelector(".downloadBtn");
@@ -304,7 +315,7 @@ function downloadTrack(i){
         text.textContent = "⬇ Скачать";
       },800);
     });
-};
+}
 
 /* ===== SEARCH ===== */
 search.oninput = () => {
