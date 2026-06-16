@@ -154,7 +154,6 @@ button{
     <button onclick="ads()">📢</button>
   </div>
 
-  <!-- SEARCH -->
   <input id="search" placeholder="Поиск музыки...">
 
   <div class="side">
@@ -186,26 +185,16 @@ button{
 </div>
 
 <script>
+
 const tracks = [
-  {
-    title:"Чёрная лампа",
-    file:"music/track1.mp3",
-    cover:"music/cover1.jpg"
-  },
-  {
-    title:"Всадники Ада",
-    file:"music/track2.mp3",
-    cover:"music/cover2.jpg"
-  },
-  {
-    title:"Чёрное рождество",
-    file:"music/track3.mp3",
-    cover:"music/cover3.png"
-  }
+  { title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg" },
+  { title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg" },
+  { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.png" }
 ];
 
 let current = 0;
 let cards = [];
+let cardButtons = [];   // 🔥 ДОБАВИЛ
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
@@ -233,6 +222,15 @@ function load(i){
   playBtn.innerText = "⏸";
 
   setActiveTrack(i);
+
+  // 🔥 обновляем кнопки карточек
+  cardButtons.forEach((btn, index) => {
+    if(index === i){
+      btn.innerText = "⏸ Playing";
+    } else {
+      btn.innerText = "▶ Play";
+    }
+  });
 }
 
 function next(){ load((current+1)%tracks.length); }
@@ -242,9 +240,11 @@ function toggle(){
   if(audio.paused){
     audio.play();
     playBtn.innerText = "⏸";
+    cardButtons[current].innerText = "⏸ Playing";
   } else {
     audio.pause();
     playBtn.innerText = "▶️";
+    cardButtons[current].innerText = "▶ Play";
   }
 }
 
@@ -270,12 +270,15 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-    <button onclick="load(${i})">▶ Play</button>
+    <button class="playBtnCard" onclick="load(${i})">▶ Play</button>
     <button onclick="download(${i})">⬇ Скачать</button>
   `;
 
   list.appendChild(div);
   cards.push(div);
+
+  // 🔥 сохраняем кнопку
+  cardButtons.push(div.querySelector(".playBtnCard"));
 });
 
 /* SEARCH */
