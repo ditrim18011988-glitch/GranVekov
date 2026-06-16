@@ -24,20 +24,28 @@ function setActiveTrack(i){
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== SYNC BUTTONS ===== */
+/* ===== BUTTON SYNC (ИСПРАВЛЕНО) ===== */
 function updateCardButtons(){
   cardPlayButtons.forEach((btn, i) => {
     if(!btn) return;
 
-    btn.innerText =
-      (i === current && !audio.paused)
-        ? "⏸ Playing"
-        : "▶ Play";
+    if(i === current){
+      btn.innerText = audio.paused ? "▶ Play" : "⏸ Playing";
+    } else {
+      btn.innerText = "▶ Play";
+    }
   });
 }
 
-/* ===== LOAD TRACK ===== */
+/* ===== LOAD TRACK (ИСПРАВЛЕНО) ===== */
 function load(i){
+
+  // 🔥 ВАЖНО: если нажали тот же трек — просто toggle
+  if(i === current){
+    toggle();
+    return;
+  }
+
   current = i;
 
   audio.src = tracks[i].file;
@@ -55,11 +63,12 @@ function load(i){
 function toggle(){
   if(audio.paused){
     audio.play();
+    playBtn.innerText = "⏸";
   } else {
     audio.pause();
+    playBtn.innerText = "▶️";
   }
 
-  playBtn.innerText = audio.paused ? "▶️" : "⏸";
   updateCardButtons();
 }
 
@@ -67,7 +76,7 @@ function toggle(){
 function next(){ load((current + 1) % tracks.length); }
 function prev(){ load((current - 1 + tracks.length) % tracks.length); }
 
-/* ===== AUDIO EVENTS (ВАЖНО) ===== */
+/* ===== AUDIO EVENTS (ПОЛНАЯ СИНХРОНИЗАЦИЯ) ===== */
 audio.addEventListener("play", updateCardButtons);
 audio.addEventListener("pause", updateCardButtons);
 audio.addEventListener("ended", next);
@@ -108,7 +117,7 @@ tracks.forEach((t, i) => {
   cardPlayButtons.push(div.querySelector(".playCardBtn"));
 });
 
-/* ===== DOWNLOAD (STABLE + SAFE) ===== */
+/* ===== DOWNLOAD (оставлено, но стабильно) ===== */
 function download(i){
   if(isDownloading) return;
 
