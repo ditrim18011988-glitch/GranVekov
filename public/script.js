@@ -15,31 +15,18 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ===== PLAYER (collapse system) ===== */
 const player = document.getElementById("player");
 const togglePlayerBtn = document.getElementById("togglePlayer");
 
 let isCollapsed = false;
 
-function setCollapsed(state){
-  isCollapsed = state;
-
-  if(player){
-    player.classList.toggle("collapsed", state);
-  }
-
-  if(togglePlayerBtn){
-    togglePlayerBtn.textContent = state ? "▴" : "▾";
-  }
-}
-
-/* ===== SAFE PLAY ===== */
+/* ================= SAFE PLAY ================= */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* ===== LOAD TRACK ===== */
+/* ================= LOAD ================= */
 function load(i){
   current = i;
 
@@ -51,41 +38,45 @@ function load(i){
   syncUI();
 }
 
-/* ===== TOGGLE TRACK ===== */
+/* ================= CARD CONTROL (FIXED) ================= */
 function toggleTrack(i){
 
-  if(i === current){
-    if(audio.paused){
-      safePlay();
-    } else {
-      audio.pause();
-    }
+  // другой трек
+  if(i !== current){
+    load(i);
     return;
   }
 
-  load(i);
+  // тот же трек — строго по состоянию
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
+
+  syncUI();
 }
 
-/* ===== MAIN PLAYER BUTTON ===== */
+/* ================= MAIN BUTTON ================= */
 function toggle(){
   if(audio.paused){
     safePlay();
   } else {
     audio.pause();
   }
+
+  syncUI();
 }
 
-/* ===== UI SYNC (FIXED CORE) ===== */
+/* ================= UI SYNC ================= */
 function syncUI(){
 
   const isPlaying = !audio.paused;
 
-  // главный плеер
   if(playBtn){
     playBtn.textContent = isPlaying ? "⏸" : "▶️";
   }
 
-  // карточки
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
     if(!btn) return;
@@ -100,16 +91,17 @@ function syncUI(){
   });
 }
 
-/* ===== EVENTS ===== */
+/* ================= EVENTS ================= */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
+
 audio.addEventListener("ended", () => {
   if(current >= 0){
     load((current + 1) % tracks.length);
   }
 });
 
-/* ===== PROGRESS ===== */
+/* ================= PROGRESS ================= */
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -120,7 +112,7 @@ progress.oninput = () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 };
 
-/* ===== CARDS ===== */
+/* ================= CARDS ================= */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -140,7 +132,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD ===== */
+/* ================= DOWNLOAD ================= */
 function downloadTrack(i){
   fetch(tracks[i].file)
     .then(r => r.blob())
@@ -158,7 +150,7 @@ function downloadTrack(i){
     });
 }
 
-/* ===== SEARCH ===== */
+/* ================= SEARCH ================= */
 searchInput.addEventListener("input", () => {
   const v = searchInput.value.toLowerCase();
 
@@ -169,7 +161,7 @@ searchInput.addEventListener("input", () => {
   });
 });
 
-/* ===== SWIPE GESTURES ===== */
+/* ================= SWIPE ================= */
 let startY = 0;
 
 player.addEventListener("touchstart", (e) => {
@@ -181,10 +173,12 @@ player.addEventListener("touchend", (e) => {
   const diff = endY - startY;
 
   if(diff > 50){
-    setCollapsed(true);
+    player.classList.add("collapsed");
+    isCollapsed = true;
   }
 
   if(diff < -50){
-    setCollapsed(false);
+    player.classList.remove("collapsed");
+    isCollapsed = false;
   }
 });
