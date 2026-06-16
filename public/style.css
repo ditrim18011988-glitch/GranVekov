@@ -221,17 +221,6 @@ body {
   cursor: pointer;
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
-  .logo img {
-    height: 260px !important;
-  }
-
-  #search {
-    width: 140px;
-  }
-}
-
 /* BUTTON FX */
 button {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -246,7 +235,7 @@ button:active {
   transform: scale(0.92);
 }
 
-/* DOWNLOAD BAR (FINAL CLEAN VERSION) */
+/* DOWNLOAD BAR */
 .download-bar {
   position: relative;
   height: 38px;
@@ -281,11 +270,72 @@ button:active {
 .download-bar span {
   position: relative;
   z-index: 2;
-  transition: 0.2s ease;
 }
 
-/* loading state (используется твоим JS) */
 .download-bar.loading {
   opacity: 0.95;
   box-shadow: 0 0 15px rgba(255, 60, 60, 0.25);
+}
+
+/* ========================= */
+/* ✅ MOBILE FIX (ВАЖНО) */
+/* ========================= */
+@media (max-width: 600px) {
+
+  /* topbar компактнее */
+  .topbar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  #search {
+    width: 120px;
+    font-size: 13px;
+  }
+
+  .actions button {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  /* логотип без перегруза */
+  .logo {
+    margin: 18px 0;
+  }
+
+  .logo img {
+    height: auto !important;
+    width: 90vw !important;
+    max-width: 360px;
+    animation: none; /* убираем тряску на мобиле */
+  }
+
+  /* сетка удобнее пальцами */
+  .container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  /* карточки компактнее */
+  .card {
+    padding: 10px;
+  }
+
+  /* плеер вертикально */
+  #player {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  #cover {
+    width: 44px;
+    height: 44px;
+  }
+
+  .controls {
+    justify-content: space-between;
+  }
 }
