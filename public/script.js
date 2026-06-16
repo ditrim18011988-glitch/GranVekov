@@ -15,64 +15,53 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ===== ACTIVE TRACK ===== */
-function setActiveTrack(i){
-  cards.forEach(c => c.classList.remove("active"));
-  if(cards[i]) cards[i].classList.add("active");
-}
-
-/* ===== SAFE PLAY ===== */
+/* ===== PLAY SAFE ===== */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* ===== LOAD TRACK ===== */
-function load(i){
+/* ===== SET TRACK (БЕЗ AUTO PLAY) ===== */
+function setTrack(i){
   current = i;
-
   audio.src = tracks[i].file;
-  title.innerText = tracks[i].title;
+  title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
-
-  safePlay();
   setActiveTrack(i);
-  syncUI();
 }
 
-/* ===== TOGGLE (плеер) ===== */
-function toggle(){
-  if(audio.paused){
+/* ===== LOAD + PLAY ===== */
+function playTrack(i){
+  if(i !== current){
+    setTrack(i);
     safePlay();
   } else {
-    audio.pause();
+    // toggle
+    if(audio.paused) safePlay();
+    else audio.pause();
   }
   syncUI();
 }
 
-/* ===== CARD TOGGLE (ВАЖНО) ===== */
-function toggleCard(i){
-  // если текущий трек
-  if(i === current){
-    if(audio.paused){
-      safePlay();
-    } else {
-      audio.pause();
-    }
-    syncUI();
-    return;
-  }
-
-  // если другой трек
-  load(i);
+/* ===== ACTIVE ===== */
+function setActiveTrack(i){
+  cards.forEach(c => c.classList.remove("active"));
+  if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== SYNC UI ===== */
+/* ===== PLAYER BUTTON ===== */
+function toggle(){
+  if(audio.paused) safePlay();
+  else audio.pause();
+  syncUI();
+}
+
+/* ===== UI ===== */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
-    const btn = c.querySelector(".playCardBtn");
+    const btn = c.querySelector("button");
     if(!btn) return;
 
     if(i === current){
@@ -84,8 +73,8 @@ function syncUI(){
 }
 
 /* ===== NEXT / PREV ===== */
-function next(){ load((current + 1) % tracks.length); }
-function prev(){ load((current - 1 + tracks.length) % tracks.length); }
+function next(){ playTrack((current+1)%tracks.length); }
+function prev(){ playTrack((current-1+tracks.length)%tracks.length); }
 
 /* ===== EVENTS ===== */
 audio.addEventListener("play", syncUI);
@@ -95,14 +84,12 @@ audio.addEventListener("ended", next);
 /* ===== PROGRESS ===== */
 audio.ontimeupdate = () => {
   if(audio.duration){
-    progress.value = (audio.currentTime / audio.duration) * 100;
+    progress.value = (audio.currentTime/audio.duration)*100;
   }
 };
 
 progress.oninput = () => {
-  if(audio.duration){
-    audio.currentTime = (progress.value / 100) * audio.duration;
-  }
+  audio.currentTime = (progress.value/100)*audio.duration;
 };
 
 /* ===== CARDS ===== */
@@ -114,7 +101,7 @@ tracks.forEach((t,i)=>{
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
-    <button class="playCardBtn" onclick="toggleCard(${i})">▶ Play</button>
+    <button onclick="playTrack(${i})">▶ Play</button>
 
     <div class="download-bar" onclick="download(${i})">
       <div class="download-fill"></div>
@@ -126,7 +113,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD (без изменений логики) ===== */
+/* ===== DOWNLOAD ===== */
 function download(i){
   const t = tracks[i];
   const bar = cards[i].querySelector(".download-bar");
@@ -162,7 +149,6 @@ searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase();
 
   cards.forEach((c,i)=>{
-    const match = tracks[i].title.toLowerCase().includes(value);
-    c.style.display = match ? "block" : "none";
+    c.style.display = tracks[i].title.toLowerCase().includes(value) ? "block":"none";
   });
 });
