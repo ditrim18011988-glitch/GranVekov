@@ -14,6 +14,8 @@ body{
   background:#0b0b10;
   color:white;
   cursor: url("music/rock-cursor.png"), auto;
+
+  padding-bottom: 120px;
 }
 
 /* TOPBAR */
@@ -61,7 +63,7 @@ body{
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
   gap:20px;
   padding:20px;
-  padding-bottom:120px;
+  padding-bottom:180px;
 }
 
 /* CARD */
@@ -121,7 +123,6 @@ button{
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
-  transition:width 0.1s linear;
 }
 
 .downloadBtn span{
@@ -129,75 +130,95 @@ button{
   z-index:2;
 }
 
-/* PLAYER */
+/* =========================
+   PLAYER (MINI + COLLAPSE)
+========================= */
+
 #player{
   position:fixed;
-  bottom:0;
   left:0;
   right:0;
-  background:#111;
-  padding:10px;
+  bottom:0;
+
   display:flex;
-  gap:10px;
   align-items:center;
+  gap:12px;
+
+  padding:10px 14px;
+  background:rgba(10,10,18,0.95);
+  backdrop-filter: blur(20px);
+
+  border-top:1px solid rgba(255,255,255,0.06);
+
+  height:92px;
+  box-sizing:border-box;
+  z-index:999;
+
+  transition:0.25s ease;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
+/* COLLAPSED MODE */
+#player.collapsed{
+  height:52px;
+  overflow:hidden;
+}
+
+#player.collapsed #cover,
+#player.collapsed .controls,
+#player.collapsed #progress{
+  display:none;
+}
+
+#player.collapsed #title{
+  font-size:14px;
+}
+
+/* COVER */
 #cover{
-  width:50px;
-  height:50px;
-  border-radius:8px;
+  width:58px;
+  height:58px;
+  border-radius:10px;
 }
 
+/* CONTROLS */
 .controls{
   display:flex;
-  gap:5px;
-}
-
-.controls button{
-  width:auto;
+  gap:10px;
 }
 
 /* PROGRESS */
 #progress{
   width:100%;
+  height:4px;
+}
+
+/* TOGGLE BUTTON */
+#togglePlayer{
+  margin-left:auto;
+  background:#222236;
+  border:none;
+  color:white;
+  border-radius:8px;
+  padding:6px 10px;
+  cursor:pointer;
 }
 
 /* MOBILE */
-@media (max-width: 600px){
+@media (max-width:768px){
 
-  .topbar{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  #search{
-    width:100%;
+  body{
+    padding-bottom:140px;
   }
 
   .container{
-    grid-template-columns: repeat(2, 1fr);
-    gap:12px;
-    padding:12px;
-  }
-
-  #player{
-    flex-direction:column;
-    align-items:stretch;
+    grid-template-columns:repeat(2,1fr);
+    padding-bottom:220px;
   }
 
   #cover{
-    width:40px;
-    height:40px;
-  }
-
-  .controls{
-    justify-content:space-between;
-  }
-
-  .logo img{
-    max-width:90vw;
-    max-height:none;
-    width:100%;
+    width:44px;
+    height:44px;
   }
 }
 </style>
@@ -219,6 +240,7 @@ button{
 
 <div id="player">
   <img id="cover">
+
   <div>
     <div id="title">Выбери трек</div>
 
@@ -229,8 +251,11 @@ button{
     </div>
 
     <input id="progress" type="range" value="0">
-    <audio id="audio"></audio>
   </div>
+
+  <button id="togglePlayer">▾</button>
+
+  <audio id="audio"></audio>
 </div>
 
 <script>
@@ -250,7 +275,6 @@ const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
-const search = document.getElementById("search");
 
 /* SAFE PLAY */
 function safePlay(){
@@ -261,7 +285,6 @@ function safePlay(){
 /* LOAD */
 function load(i){
   current = i;
-
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
@@ -271,54 +294,25 @@ function load(i){
   syncUI();
 }
 
-/* ACTIVE */
 function setActive(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* TOGGLE */
+/* PLAY TOGGLE */
 function toggle(){
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
-  syncUI();
-}
-
-/* 🔥 FIX: карточка теперь умеет toggle */
-function toggleCard(i){
-  if(i === current){
-    toggle();
-  } else {
-    load(i);
-  }
-}
-
-/* SYNC UI */
-function syncUI(){
-  playBtn.textContent = audio.paused ? "▶️" : "⏸";
-
-  cards.forEach((c,i)=>{
-    const btn = c.querySelector("button");
-    if(!btn) return;
-
-    btn.textContent =
-      (i === current && !audio.paused)
-        ? "⏸ Pause"
-        : "▶ Play";
-  });
+  if(audio.paused) safePlay();
+  else audio.pause();
 }
 
 /* NEXT / PREV */
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* EVENTS */
-audio.addEventListener("play", syncUI);
-audio.addEventListener("pause", syncUI);
-audio.addEventListener("ended", next);
+/* UI SYNC */
+function syncUI(){
+  playBtn.textContent = audio.paused ? "▶️" : "⏸";
+}
 
 /* PROGRESS */
 audio.ontimeupdate = () => {
@@ -339,7 +333,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-    <button onclick="toggleCard(${i})">▶ Play</button>
+    <button onclick="load(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -354,41 +348,46 @@ tracks.forEach((t,i)=>{
 /* DOWNLOAD */
 function downloadTrack(i){
   const t = tracks[i];
-  const btn = cards[i].querySelector(".downloadBtn");
-  const fill = btn.querySelector(".fill");
-  const text = btn.querySelector("span");
-
   fetch(t.file)
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = url;
       a.download = t.title + ".mp3";
-      document.body.appendChild(a);
       a.click();
-      a.remove();
-
       URL.revokeObjectURL(url);
-
-      fill.style.width = "100%";
-      text.textContent = "✔ Готово";
-
-      setTimeout(()=>{
-        fill.style.width = "0%";
-        text.textContent = "⬇ Скачать";
-      },800);
     });
 }
 
-/* SEARCH */
-search.oninput = () => {
-  const v = search.value.toLowerCase();
-  cards.forEach((c,i)=>{
-    c.style.display = tracks[i].title.toLowerCase().includes(v) ? "block":"none";
-  });
+/* COLLAPSE PLAYER */
+const player = document.getElementById("player");
+const toggleBtn = document.getElementById("togglePlayer");
+
+let collapsed = false;
+
+toggleBtn.onclick = () => {
+  collapsed = !collapsed;
+  player.classList.toggle("collapsed", collapsed);
+  toggleBtn.textContent = collapsed ? "▴" : "▾";
 };
+
+/* SWIPE DOWN TO COLLAPSE */
+let startY = 0;
+
+player.addEventListener("touchstart", e=>{
+  startY = e.touches[0].clientY;
+});
+
+player.addEventListener("touchend", e=>{
+  let endY = e.changedTouches[0].clientY;
+
+  if(endY - startY > 50){
+    collapsed = true;
+    player.classList.add("collapsed");
+    toggleBtn.textContent = "▴";
+  }
+});
 
 /* EXTRA */
 function donate(){ window.open("https://paypal.me/yourlink"); }
