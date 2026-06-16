@@ -67,7 +67,7 @@ function toggle() {
   }
 }
 
-/* ===== ПРОГРЕСС ===== */
+/* ===== ПРОГРЕСС ПЛЕЕРА ===== */
 audio.ontimeupdate = () => {
   if (audio.duration) {
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -91,13 +91,57 @@ tracks.forEach((t, i) => {
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
+
     <button onclick="load(${i})">▶ Play</button>
-    <button onclick="download(${i})">⬇ Скачать</button>
+
+    <div class="download-bar" id="dl-${i}" onclick="download(${i})">
+      <div class="download-fill"></div>
+      <span>⬇ Скачать</span>
+    </div>
   `;
 
   list.appendChild(div);
   cards.push(div);
 });
+
+/* ===== СКАЧИВАНИЕ С ПРОГРЕССОМ ===== */
+function download(i) {
+  const t = tracks[i];
+  const bar = document.getElementById(`dl-${i}`);
+  const fill = bar.querySelector(".download-fill");
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", t.file, true);
+  xhr.responseType = "blob";
+
+  fill.style.width = "0%";
+  bar.classList.add("loading");
+
+  xhr.onprogress = (e) => {
+    if (e.lengthComputable) {
+      fill.style.width = (e.loaded / e.total) * 100 + "%";
+    }
+  };
+
+  xhr.onload = () => {
+    const url = URL.createObjectURL(xhr.response);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = t.title + ".mp3";
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+    fill.style.width = "0%";
+    bar.classList.remove("loading");
+  };
+
+  xhr.send();
+}
 
 /* ===== ПОИСК ===== */
 searchInput.addEventListener("input", () => {
@@ -115,42 +159,10 @@ searchInput.addEventListener("input", () => {
     if (match) found = true;
   });
 
-  // если ничего не найдено — можно слегка подсветить
-  if (!found && value.length > 0) {
-    list.style.opacity = "0.5";
-  } else {
-    list.style.opacity = "1";
-  }
+  list.style.opacity = (!found && value.length > 0) ? "0.5" : "1";
 });
 
-/* ===== СКАЧИВАНИЕ ===== */
-async function download(i) {
-  const t = tracks[i];
-
-  const response = await fetch(t.file);
-  const blob = await response.blob();
-
-  const url = window.URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = t.title + ".mp3";
-
-  document.body.appendChild(a);
-  a.click();
-
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
-
-/* ===== ДОП ===== */
-function donate() {
-  window.open("https://paypal.me/yourlink", "_blank");
-}
-
-function ads() {
-  alert("Реклама здесь");
-}
+/* ===== КНОПКИ ЭФФЕКТ ===== */
 document.querySelectorAll("button").forEach(btn => {
   btn.addEventListener("mousedown", () => {
     btn.style.transform = "scale(0.92)";
