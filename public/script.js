@@ -15,6 +15,27 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
+/* ===== PLAYER (collapse system) ===== */
+const player = document.getElementById("player");
+const togglePlayerBtn = document.getElementById("togglePlayer");
+
+let isCollapsed = false;
+
+function setCollapsed(state){
+  isCollapsed = state;
+  player.classList.toggle("collapsed", state);
+  if(togglePlayerBtn){
+    togglePlayerBtn.textContent = state ? "▴" : "▾";
+  }
+}
+
+/* toggle button */
+if(togglePlayerBtn){
+  togglePlayerBtn.addEventListener("click", () => {
+    setCollapsed(!isCollapsed);
+  });
+}
+
 /* ===== PLAY SAFE ===== */
 function safePlay(){
   const p = audio.play();
@@ -33,30 +54,25 @@ function load(i){
   syncUI();
 }
 
-/* ===== THIS IS THE FIX ===== */
+/* ===== TOGGLE TRACK ===== */
 function toggleTrack(i){
 
-  // если нажали тот же трек
   if(i === current){
-    if(audio.paused){
-      safePlay();
-    } else {
-      audio.pause();
-    }
+    if(audio.paused) safePlay();
+    else audio.pause();
     return;
   }
 
-  // если другой трек
   load(i);
 }
 
-/* ===== MAIN PLAYER BUTTON ===== */
+/* ===== MAIN BUTTON ===== */
 function toggle(){
   if(audio.paused) safePlay();
   else audio.pause();
 }
 
-/* ===== UI SYNC ===== */
+/* ===== UI ===== */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
@@ -68,15 +84,16 @@ function syncUI(){
     } else {
       btn.textContent = "▶ Play";
     }
-  });
 
-  cards.forEach(c => c.classList.remove("active"));
-  if(cards[current]) cards[current].classList.add("active");
+    c.classList.remove("active");
+    if(i === current) c.classList.add("active");
+  });
 }
 
 /* ===== EVENTS ===== */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
+
 audio.addEventListener("ended", () => {
   if(current >= 0) load((current + 1) % tracks.length);
 });
@@ -135,4 +152,26 @@ searchInput.addEventListener("input", () => {
   cards.forEach((c,i)=>{
     c.style.display = tracks[i].title.toLowerCase().includes(v) ? "block" : "none";
   });
+});
+
+/* ===== SWIPE GESTURES ===== */
+let startY = 0;
+
+player.addEventListener("touchstart", (e) => {
+  startY = e.touches[0].clientY;
+});
+
+player.addEventListener("touchend", (e) => {
+  const endY = e.changedTouches[0].clientY;
+  const diff = endY - startY;
+
+  // свайп вниз → свернуть
+  if(diff > 50){
+    setCollapsed(true);
+  }
+
+  // свайп вверх → развернуть
+  if(diff < -50){
+    setCollapsed(false);
+  }
 });
