@@ -15,18 +15,13 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-const player = document.getElementById("player");
-const togglePlayerBtn = document.getElementById("togglePlayer");
-
-let isCollapsed = false;
-
 /* ================= SAFE PLAY ================= */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* ================= LOAD ================= */
+/* ================= LOAD TRACK ================= */
 function load(i){
   current = i;
 
@@ -38,7 +33,7 @@ function load(i){
   syncUI();
 }
 
-/* ================= CARD CONTROL (FIXED) ================= */
+/* ================= CARD CLICK ================= */
 function toggleTrack(i){
 
   // другой трек
@@ -47,7 +42,7 @@ function toggleTrack(i){
     return;
   }
 
-  // тот же трек — строго по состоянию
+  // тот же трек → play/pause
   if(audio.paused){
     safePlay();
   } else {
@@ -57,7 +52,7 @@ function toggleTrack(i){
   syncUI();
 }
 
-/* ================= MAIN BUTTON ================= */
+/* ================= PLAYER BUTTON ================= */
 function toggle(){
   if(audio.paused){
     safePlay();
@@ -73,9 +68,7 @@ function syncUI(){
 
   const isPlaying = !audio.paused;
 
-  if(playBtn){
-    playBtn.textContent = isPlaying ? "⏸" : "▶️";
-  }
+  playBtn.textContent = isPlaying ? "⏸" : "▶️";
 
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
@@ -120,6 +113,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
+
     <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
@@ -132,16 +126,18 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ================= DOWNLOAD ================= */
+/* ================= DOWNLOAD (ВОЗВРАТ НОРМАЛЬНОЙ ВЕРСИИ) ================= */
 function downloadTrack(i){
-  fetch(tracks[i].file)
+  const t = tracks[i];
+
+  fetch(t.file)
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = tracks[i].title + ".mp3";
+      a.download = t.title + ".mp3";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -159,26 +155,4 @@ searchInput.addEventListener("input", () => {
       ? "block"
       : "none";
   });
-});
-
-/* ================= SWIPE ================= */
-let startY = 0;
-
-player.addEventListener("touchstart", (e) => {
-  startY = e.touches[0].clientY;
-});
-
-player.addEventListener("touchend", (e) => {
-  const endY = e.changedTouches[0].clientY;
-  const diff = endY - startY;
-
-  if(diff > 50){
-    player.classList.add("collapsed");
-    isCollapsed = true;
-  }
-
-  if(diff < -50){
-    player.classList.remove("collapsed");
-    isCollapsed = false;
-  }
 });
