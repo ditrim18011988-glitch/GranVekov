@@ -22,7 +22,6 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* SEARCH */
 #search {
   padding: 8px 12px;
   border-radius: 10px;
@@ -40,7 +39,6 @@ body {
   transform: scale(1.03);
 }
 
-/* actions */
 .actions {
   display: flex;
   gap: 10px;
@@ -234,7 +232,7 @@ body {
   }
 }
 
-/* ===== BUTTON FX ===== */
+/* BUTTON FX */
 button {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -248,20 +246,23 @@ button:active {
   transform: scale(0.92);
 }
 
-/* ===== DOWNLOAD PROGRESS BAR ===== */
+/* DOWNLOAD BAR (FINAL CLEAN VERSION) */
 .download-bar {
   position: relative;
   height: 38px;
   margin-top: 8px;
   border-radius: 10px;
   overflow: hidden;
+
   background: #222236;
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+
   font-size: 14px;
+  color: white;
 }
 
 .download-fill {
@@ -270,52 +271,21 @@ button:active {
   top: 0;
   height: 100%;
   width: 0%;
+
   background: linear-gradient(90deg, #ff3c3c, #ff7a7a);
   transition: width 0.1s linear;
+
   z-index: 1;
 }
 
 .download-bar span {
   position: relative;
   z-index: 2;
-}
-
-.download-bar.loading {
-  opacity: 0.9;
-}
-/* ===== DOWNLOAD LOADING EFFECT FIX ===== */
-
-/* активное состояние загрузки */
-.download-bar.loading {
-  opacity: 1;
-  box-shadow: 0 0 15px rgba(255, 60, 60, 0.25);
-}
-
-/* более “живой” прогресс */
-.download-fill {
-  background: linear-gradient(
-    90deg,
-    #ff3c3c,
-    #ff7a7a,
-    #ff3c3c
-  );
-  background-size: 200% 100%;
-  animation: downloadGlow 1.2s linear infinite;
-}
-
-/* анимация перелива */
-@keyframes downloadGlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
-}
-
-/* текст поверх загрузки */
-.download-bar span {
   transition: 0.2s ease;
 }
 
-/* когда идёт загрузка — текст чуть ярче */
-.download-bar.loading span {
-  color: #fff;
-  text-shadow: 0 0 8px rgba(255, 60, 60, 0.4);
+/* loading state (используется твоим JS) */
+.download-bar.loading {
+  opacity: 0.95;
+  box-shadow: 0 0 15px rgba(255, 60, 60, 0.25);
 }
