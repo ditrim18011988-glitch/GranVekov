@@ -25,13 +25,12 @@ const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
+const searchInput = document.getElementById("search");
 
 /* ===== АКТИВНЫЙ ТРЕК ===== */
 function setActiveTrack(index) {
   cards.forEach(c => c.classList.remove("active"));
-  if (cards[index]) {
-    cards[index].classList.add("active");
-  }
+  if (cards[index]) cards[index].classList.add("active");
 }
 
 /* ===== ЗАГРУЗКА ТРЕКА ===== */
@@ -68,7 +67,7 @@ function toggle() {
   }
 }
 
-/* ===== ПРОГРЕСС БАР ===== */
+/* ===== ПРОГРЕСС ===== */
 audio.ontimeupdate = () => {
   if (audio.duration) {
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -100,6 +99,30 @@ tracks.forEach((t, i) => {
   cards.push(div);
 });
 
+/* ===== ПОИСК ===== */
+searchInput.addEventListener("input", () => {
+  const value = searchInput.value.toLowerCase();
+
+  let found = false;
+
+  tracks.forEach((t, i) => {
+    const match = t.title.toLowerCase().includes(value);
+
+    if (cards[i]) {
+      cards[i].style.display = match ? "block" : "none";
+    }
+
+    if (match) found = true;
+  });
+
+  // если ничего не найдено — можно слегка подсветить
+  if (!found && value.length > 0) {
+    list.style.opacity = "0.5";
+  } else {
+    list.style.opacity = "1";
+  }
+});
+
 /* ===== СКАЧИВАНИЕ ===== */
 async function download(i) {
   const t = tracks[i];
@@ -120,7 +143,7 @@ async function download(i) {
   window.URL.revokeObjectURL(url);
 }
 
-/* ===== ДОП. КНОПКИ ===== */
+/* ===== ДОП ===== */
 function donate() {
   window.open("https://paypal.me/yourlink", "_blank");
 }
