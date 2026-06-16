@@ -15,7 +15,7 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ===== SAFE PLAY ===== */
+/* ===== PLAY SAFE ===== */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
@@ -30,34 +30,30 @@ function load(i){
   cover.src = tracks[i].cover;
 
   safePlay();
-  setActive(i);
   syncUI();
 }
 
-/* ===== TOGGLE (главное исправление) ===== */
+/* ===== THIS IS THE FIX ===== */
 function toggleTrack(i){
+
+  // если нажали тот же трек
   if(i === current){
     if(audio.paused){
       safePlay();
     } else {
       audio.pause();
     }
-  } else {
-    load(i);
+    return;
   }
+
+  // если другой трек
+  load(i);
 }
 
-/* ===== PLAYER BUTTON ===== */
+/* ===== MAIN PLAYER BUTTON ===== */
 function toggle(){
   if(audio.paused) safePlay();
   else audio.pause();
-  syncUI();
-}
-
-/* ===== ACTIVE ===== */
-function setActive(i){
-  cards.forEach(c => c.classList.remove("active"));
-  if(cards[i]) cards[i].classList.add("active");
 }
 
 /* ===== UI SYNC ===== */
@@ -65,8 +61,7 @@ function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
-    const btn = c.querySelector(".cardBtn");
-    if(!btn) return;
+    const btn = c.querySelector("button");
 
     if(i === current){
       btn.textContent = audio.paused ? "▶ Play" : "⏸ Pause";
@@ -74,6 +69,9 @@ function syncUI(){
       btn.textContent = "▶ Play";
     }
   });
+
+  cards.forEach(c => c.classList.remove("active"));
+  if(cards[current]) cards[current].classList.add("active");
 }
 
 /* ===== EVENTS ===== */
@@ -102,10 +100,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-
-    <button class="cardBtn" onclick="toggleTrack(${i})">
-      ▶ Play
-    </button>
+    <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -117,21 +112,18 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD (не трогал, рабочий) ===== */
+/* ===== DOWNLOAD ===== */
 function downloadTrack(i){
-  const t = tracks[i];
-  fetch(t.file)
+  fetch(tracks[i].file)
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = url;
-      a.download = t.title + ".mp3";
+      a.download = tracks[i].title + ".mp3";
       document.body.appendChild(a);
       a.click();
       a.remove();
-
       URL.revokeObjectURL(url);
     });
 }
