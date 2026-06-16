@@ -4,11 +4,8 @@ const tracks = [
   { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.png" }
 ];
 
-let current = 0;
+let current = -1;
 let cards = [];
-let cardPlayButtons = [];
-let isDownloading = false;
-let activeXHR = null;
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
@@ -24,61 +21,75 @@ function setActiveTrack(i){
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== BUTTON SYNC (ИСПРАВЛЕНО) ===== */
-function updateCardButtons(){
-  cardPlayButtons.forEach((btn, i) => {
-    if(!btn) return;
-
-    if(i === current){
-      btn.innerText = audio.paused ? "▶ Play" : "⏸ Playing";
-    } else {
-      btn.innerText = "▶ Play";
-    }
-  });
+/* ===== SAFE PLAY ===== */
+function safePlay(){
+  const p = audio.play();
+  if(p && p.catch) p.catch(()=>{});
 }
 
-/* ===== LOAD TRACK (ИСПРАВЛЕНО) ===== */
+/* ===== LOAD TRACK ===== */
 function load(i){
-
-  // 🔥 ВАЖНО: если нажали тот же трек — просто toggle
-  if(i === current){
-    toggle();
-    return;
-  }
-
   current = i;
 
   audio.src = tracks[i].file;
   title.innerText = tracks[i].title;
   cover.src = tracks[i].cover;
 
-  audio.play();
-  playBtn.innerText = "⏸";
-
+  safePlay();
   setActiveTrack(i);
-  updateCardButtons();
+  syncUI();
 }
 
-/* ===== PLAY / PAUSE ===== */
+/* ===== TOGGLE (плеер) ===== */
 function toggle(){
   if(audio.paused){
-    audio.play();
-    playBtn.innerText = "⏸";
+    safePlay();
   } else {
     audio.pause();
-    playBtn.innerText = "▶️";
+  }
+  syncUI();
+}
+
+/* ===== CARD TOGGLE (ВАЖНО) ===== */
+function toggleCard(i){
+  // если текущий трек
+  if(i === current){
+    if(audio.paused){
+      safePlay();
+    } else {
+      audio.pause();
+    }
+    syncUI();
+    return;
   }
 
-  updateCardButtons();
+  // если другой трек
+  load(i);
+}
+
+/* ===== SYNC UI ===== */
+function syncUI(){
+  playBtn.textContent = audio.paused ? "▶️" : "⏸";
+
+  cards.forEach((c,i)=>{
+    const btn = c.querySelector(".playCardBtn");
+    if(!btn) return;
+
+    if(i === current){
+      btn.textContent = audio.paused ? "▶ Play" : "⏸ Pause";
+    } else {
+      btn.textContent = "▶ Play";
+    }
+  });
 }
 
 /* ===== NEXT / PREV ===== */
 function next(){ load((current + 1) % tracks.length); }
 function prev(){ load((current - 1 + tracks.length) % tracks.length); }
 
-/* ===== AUDIO EVENTS (ПОЛНАЯ СИНХРОНИЗАЦИЯ) ===== */
-audio.addEventListener("play", updateCardButtons);
-audio.addEventListener("pause", updateCardButtons);
+/* ===== EVENTS ===== */
+audio.addEventListener("play", syncUI);
+audio.addEventListener("pause", syncUI);
 audio.addEventListener("ended", next);
 
 /* ===== PROGRESS ===== */
@@ -95,16 +106,15 @@ progress.oninput = () => {
 };
 
 /* ===== CARDS ===== */
-tracks.forEach((t, i) => {
+tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
-  div.style.animationDelay = `${i * 0.1}s`;
 
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
-    <button class="playCardBtn" onclick="load(${i})">▶ Play</button>
+    <button class="playCardBtn" onclick="toggleCard(${i})">▶ Play</button>
 
     <div class="download-bar" onclick="download(${i})">
       <div class="download-fill"></div>
@@ -114,93 +124,45 @@ tracks.forEach((t, i) => {
 
   list.appendChild(div);
   cards.push(div);
-  cardPlayButtons.push(div.querySelector(".playCardBtn"));
 });
 
-/* ===== DOWNLOAD (оставлено, но стабильно) ===== */
+/* ===== DOWNLOAD (без изменений логики) ===== */
 function download(i){
-  if(isDownloading) return;
-
   const t = tracks[i];
   const bar = cards[i].querySelector(".download-bar");
   const fill = bar.querySelector(".download-fill");
   const text = bar.querySelector("span");
 
-  if(activeXHR){
-    activeXHR.abort();
-    activeXHR = null;
-  }
+  fetch(t.file)
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
 
-  isDownloading = true;
-  bar.classList.add("loading");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = t.title + ".mp3";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
 
-  const xhr = new XMLHttpRequest();
-  activeXHR = xhr;
+      URL.revokeObjectURL(url);
 
-  xhr.open("GET", t.file, true);
-  xhr.responseType = "blob";
+      fill.style.width = "100%";
+      text.textContent = "✔ Готово";
 
-  fill.style.width = "0%";
-  text.innerText = "0%";
-
-  xhr.onprogress = (e) => {
-    if(e.lengthComputable){
-      const percent = Math.floor((e.loaded / e.total) * 100);
-      fill.style.width = percent + "%";
-      text.innerText = percent + "%";
-    }
-  };
-
-  xhr.onload = () => {
-    const url = URL.createObjectURL(xhr.response);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = t.title + ".mp3";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    URL.revokeObjectURL(url);
-
-    resetDownload(bar, fill, text);
-  };
-
-  xhr.onerror = () => {
-    text.innerText = "Ошибка";
-    resetDownload(bar, fill, text);
-  };
-
-  xhr.onabort = () => {
-    resetDownload(bar, fill, text);
-  };
-
-  xhr.send();
-}
-
-/* ===== RESET DOWNLOAD ===== */
-function resetDownload(bar, fill, text){
-  setTimeout(() => {
-    fill.style.width = "0%";
-    text.innerText = "⬇ Скачать";
-    bar.classList.remove("loading");
-
-    isDownloading = false;
-    activeXHR = null;
-  }, 400);
+      setTimeout(()=>{
+        fill.style.width = "0%";
+        text.textContent = "⬇ Скачать";
+      },800);
+    });
 }
 
 /* ===== SEARCH ===== */
 searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase();
 
-  let found = false;
-
-  tracks.forEach((t, i) => {
-    const match = t.title.toLowerCase().includes(value);
-    cards[i].style.display = match ? "block" : "none";
-    if(match) found = true;
+  cards.forEach((c,i)=>{
+    const match = tracks[i].title.toLowerCase().includes(value);
+    c.style.display = match ? "block" : "none";
   });
-
-  list.style.opacity = (!found && value.length > 0) ? "0.5" : "1";
 });
