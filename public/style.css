@@ -8,14 +8,9 @@ body {
 
 /* TOPBAR */
 .topbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 16px 20px;
   background: rgba(15, 15, 25, 0.6);
   backdrop-filter: blur(18px);
@@ -27,66 +22,26 @@ body {
   border-radius: 10px;
   border: none;
   outline: none;
-
   background: #1b1b2a;
   color: white;
   width: 220px;
   transition: 0.2s;
 }
 
-#search:focus {
-  box-shadow: 0 0 15px rgba(255,60,60,0.4);
-  transform: scale(1.03);
-}
-
-/* ACTIONS */
-.actions {
-  display: flex;
-  gap: 10px;
-}
-
-.actions button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 10px;
-  background: #222236;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.actions button:hover {
-  background: #2f2f4a;
-  transform: scale(1.05);
-}
-
 /* LOGO */
 .logo {
-  width: 100%;
   display: flex;
   justify-content: center;
-  margin: 40px 0;
+  margin: 30px 0;
+  padding: 0 10px;
 }
 
 .logo img {
   width: auto;
   height: 420px;
   max-width: 95vw;
-  border-radius: 18px;
-  animation: floatLogo 4s ease-in-out infinite;
-  filter: drop-shadow(0 0 25px rgba(255,60,60,0.25));
-  transition: 0.3s ease;
-}
-
-.logo img:hover {
-  transform: scale(1.08);
-  filter: drop-shadow(0 0 70px rgba(255,60,60,0.7));
-}
-
-@keyframes floatLogo {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
+  border-radius: 16px;
+  display: block;
 }
 
 /* GRID */
@@ -97,47 +52,28 @@ body {
 
   padding: 20px;
 
-  /* 🔥 ВАЖНЕЙШИЙ ФИКС */
-  padding-bottom: 220px;
+  /* 🔥 КЛЮЧЕВОЙ ФИКС */
+  padding-bottom: 180px;
 }
 
 /* CARD */
 .card {
-  background: linear-gradient(145deg, #1b1b2a, #101018);
+  background: #1a1a25;
   border-radius: 16px;
   padding: 12px;
 
   opacity: 0;
   transform: translateY(12px);
   animation: fadeIn 0.5s ease forwards;
-
-  transition: 0.25s ease;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.card:hover {
-  transform: translateY(-10px) scale(1.04);
-}
-
-.card.active {
-  border: 1px solid #ff3c3c;
-  box-shadow: 0 0 35px rgba(255,60,60,0.4);
-}
-
-/* FADE */
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .card img {
   width: 100%;
   border-radius: 12px;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* BUTTON */
@@ -155,14 +91,12 @@ button {
 /* DOWNLOAD */
 .download-bar {
   position: relative;
-  height: 38px;
+  height: 40px;
   margin-top: 8px;
   border-radius: 10px;
   overflow: hidden;
 
   background: #222236;
-  cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,12 +117,15 @@ button {
   z-index: 2;
 }
 
-/* PLAYER 🔥 FIX */
+/* ========================= */
+/* 🔥 PLAYER FIX (ГЛАВНОЕ ИСПРАВЛЕНИЕ) */
+/* ========================= */
+
 #player {
   position: fixed;
-  bottom: 0;
   left: 0;
   right: 0;
+  bottom: 0;
 
   display: flex;
   align-items: center;
@@ -197,10 +134,12 @@ button {
   padding: 12px 18px;
   background: rgba(10,10,18,0.95);
   backdrop-filter: blur(20px);
+
   border-top: 1px solid rgba(255,255,255,0.06);
 
-  /* 🔥 КЛЮЧЕВОЙ ФИКС */
-  min-height: 90px;
+  /* ВАЖНО: фиксируем высоту */
+  height: 92px;
+
   box-sizing: border-box;
   z-index: 999;
 }
@@ -214,51 +153,31 @@ button {
 .controls {
   display: flex;
   gap: 10px;
-  margin-top: 6px;
 }
 
-.controls button {
-  background: #222236;
-  padding: 7px 12px;
-  border-radius: 10px;
-}
-
-/* PROGRESS */
 #progress {
   width: 100%;
   height: 4px;
 }
 
 /* ================= MOBILE ================= */
+
 @media (max-width: 768px) {
-
-  .topbar {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  #search {
-    width: 100%;
-  }
-
-  .logo img {
-    width: 90vw;
-    height: auto;
-    animation: none;
-  }
 
   .container {
     grid-template-columns: repeat(2, 1fr);
-    padding: 10px;
 
-    /* 🔥 ещё больше место под плеер */
-    padding-bottom: 260px;
+    /* 🔥 компенсируем реальную высоту плеера */
+    padding-bottom: 200px;
   }
 
   #player {
     flex-direction: column;
     align-items: stretch;
-    min-height: 110px;
+
+    /* фикс высоты важен */
+    height: 120px;
+
     padding: 10px;
   }
 
@@ -269,5 +188,9 @@ button {
 
   .controls {
     justify-content: space-between;
+  }
+
+  #search {
+    width: 100%;
   }
 }
