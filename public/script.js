@@ -13,50 +13,21 @@ const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
-const searchInput = document.getElementById("search");
+const search = document.getElementById("search");
 
-/* ===== PLAY SAFE ===== */
+/* ===== SAFE PLAY ===== */
 function safePlay(){
   const p = audio.play();
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* ===== SET TRACK (БЕЗ AUTO PLAY) ===== */
-function setTrack(i){
-  current = i;
-  audio.src = tracks[i].file;
-  title.textContent = tracks[i].title;
-  cover.src = tracks[i].cover;
-  setActiveTrack(i);
-}
-
-/* ===== LOAD + PLAY ===== */
-function playTrack(i){
-  if(i !== current){
-    setTrack(i);
-    safePlay();
-  } else {
-    // toggle
-    if(audio.paused) safePlay();
-    else audio.pause();
-  }
-  syncUI();
-}
-
-/* ===== ACTIVE ===== */
-function setActiveTrack(i){
+/* ===== SET ACTIVE ===== */
+function setActive(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* ===== PLAYER BUTTON ===== */
-function toggle(){
-  if(audio.paused) safePlay();
-  else audio.pause();
-  syncUI();
-}
-
-/* ===== UI ===== */
+/* ===== SYNC UI ===== */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
@@ -70,11 +41,48 @@ function syncUI(){
       btn.textContent = "▶ Play";
     }
   });
+
+  setActive(current);
+}
+
+/* ===== LOAD TRACK (ТОЛЬКО ЗАГРУЗКА) ===== */
+function load(i){
+  current = i;
+
+  audio.src = tracks[i].file;
+  title.textContent = tracks[i].title;
+  cover.src = tracks[i].cover;
+
+  safePlay();
+  syncUI();
+}
+
+/* ===== CLICK CARD BUTTON ===== */
+function toggleCard(i){
+
+  // если тот же трек — просто пауза/плей
+  if(i === current){
+    if(audio.paused) safePlay();
+    else audio.pause();
+
+    syncUI();
+    return;
+  }
+
+  // если другой трек — загружаем новый
+  load(i);
+}
+
+/* ===== PLAYER BUTTON ===== */
+function toggle(){
+  if(audio.paused) safePlay();
+  else audio.pause();
+  syncUI();
 }
 
 /* ===== NEXT / PREV ===== */
-function next(){ playTrack((current+1)%tracks.length); }
-function prev(){ playTrack((current-1+tracks.length)%tracks.length); }
+function next(){ load((current+1)%tracks.length); }
+function prev(){ load((current-1+tracks.length)%tracks.length); }
 
 /* ===== EVENTS ===== */
 audio.addEventListener("play", syncUI);
@@ -89,7 +97,9 @@ audio.ontimeupdate = () => {
 };
 
 progress.oninput = () => {
-  audio.currentTime = (progress.value/100)*audio.duration;
+  if(audio.duration){
+    audio.currentTime = (progress.value/100)*audio.duration;
+  }
 };
 
 /* ===== CARDS ===== */
@@ -100,11 +110,10 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
+    <button onclick="toggleCard(${i})">▶ Play</button>
 
-    <button onclick="playTrack(${i})">▶ Play</button>
-
-    <div class="download-bar" onclick="download(${i})">
-      <div class="download-fill"></div>
+    <div class="downloadBtn" onclick="downloadTrack(${i})">
+      <div class="fill"></div>
       <span>⬇ Скачать</span>
     </div>
   `;
@@ -113,12 +122,12 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ===== DOWNLOAD ===== */
-function download(i){
+/* ===== DOWNLOAD (НЕ ТРОГАЕМ) ===== */
+function downloadTrack(i){
   const t = tracks[i];
-  const bar = cards[i].querySelector(".download-bar");
-  const fill = bar.querySelector(".download-fill");
-  const text = bar.querySelector("span");
+  const btn = cards[i].querySelector(".downloadBtn");
+  const fill = btn.querySelector(".fill");
+  const text = btn.querySelector("span");
 
   fetch(t.file)
     .then(r => r.blob())
@@ -145,10 +154,9 @@ function download(i){
 }
 
 /* ===== SEARCH ===== */
-searchInput.addEventListener("input", () => {
-  const value = searchInput.value.toLowerCase();
-
+search.oninput = () => {
+  const v = search.value.toLowerCase();
   cards.forEach((c,i)=>{
-    c.style.display = tracks[i].title.toLowerCase().includes(value) ? "block":"none";
+    c.style.display = tracks[i].title.toLowerCase().includes(v) ? "block":"none";
   });
-});
+};
