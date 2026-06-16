@@ -4,6 +4,9 @@ body {
   background: radial-gradient(circle at top, #141427, #07070c);
   color: white;
   cursor: url("music/rock-cursor.png"), auto;
+
+  /* 🔥 ВАЖНО: резерв под фиксированный плеер */
+  padding-bottom: 140px;
 }
 
 /* TOPBAR */
@@ -17,6 +20,7 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
+/* SEARCH */
 #search {
   padding: 8px 12px;
   border-radius: 10px;
@@ -49,10 +53,9 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
-
   padding: 20px;
 
-  /* 🔥 КЛЮЧЕВОЙ ФИКС */
+  /* 🔥 ключевой фикс */
   padding-bottom: 180px;
 }
 
@@ -118,7 +121,7 @@ button {
 }
 
 /* ========================= */
-/* 🔥 PLAYER FIX (ГЛАВНОЕ ИСПРАВЛЕНИЕ) */
+/* PLAYER FIX (ГЛАВНАЯ ЧАСТЬ) */
 /* ========================= */
 
 #player {
@@ -137,9 +140,7 @@ button {
 
   border-top: 1px solid rgba(255,255,255,0.06);
 
-  /* ВАЖНО: фиксируем высоту */
   height: 92px;
-
   box-sizing: border-box;
   z-index: 999;
 }
@@ -164,19 +165,21 @@ button {
 
 @media (max-width: 768px) {
 
+  body {
+    padding-bottom: 160px; /* 🔥 компенсирует мобильный плеер */
+  }
+
   .container {
     grid-template-columns: repeat(2, 1fr);
-
-    /* 🔥 компенсируем реальную высоту плеера */
-    padding-bottom: 200px;
+    padding-bottom: 220px;
   }
 
   #player {
     flex-direction: column;
     align-items: stretch;
 
-    /* фикс высоты важен */
-    height: 120px;
+    height: auto;          /* 🔥 важно: убираем фикс */
+    min-height: 120px;
 
     padding: 10px;
   }
