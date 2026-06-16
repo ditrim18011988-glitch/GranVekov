@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Грань Веков</title>
+
 <link rel="icon" href="music/favicon.png">
 <link rel="shortcut icon" href="music/favicon.png">
 <link rel="apple-touch-icon" href="music/favicon.png">
@@ -14,22 +15,42 @@ body{
   font-family: Arial;
   background:#0b0b10;
   color:white;
+  cursor: url("music/rock-cursor.png"), auto;
 }
 
+/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:10px 20px;
   background:#111;
+  gap:10px;
 }
 
+/* SEARCH */
+#search{
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  background:#1a1a25;
+  color:white;
+  width:200px;
+}
+
+#search:focus{
+  box-shadow:0 0 10px rgba(255,60,60,0.4);
+}
+
+/* side buttons */
 .side{
   width:60px;
   display:flex;
   justify-content:center;
 }
 
+/* LOGO */
 .logo{
   width:100%;
   display:flex;
@@ -67,7 +88,7 @@ body{
   transition: 0.25s ease;
 }
 
-/* активный трек */
+/* active */
 .card.active{
   border:1px solid #ff3c3c;
   box-shadow:0 0 25px rgba(255,60,60,0.4);
@@ -94,8 +115,10 @@ button{
   border-radius:10px;
   background:#ff3c3c;
   color:white;
+  cursor:pointer;
 }
 
+/* PLAYER */
 #player{
   position:fixed;
   bottom:0;
@@ -121,13 +144,6 @@ button{
 .controls button{
   width:auto;
 }
-
-button,
-a,
-.card,
-.controls button {
-  cursor: url("music/rock-cursor.png"), pointer;
-}
 </style>
 </head>
 
@@ -137,6 +153,9 @@ a,
   <div class="side">
     <button onclick="ads()">📢</button>
   </div>
+
+  <!-- SEARCH -->
+  <input id="search" placeholder="Поиск музыки...">
 
   <div class="side">
     <button onclick="donate()">💰</button>
@@ -194,14 +213,15 @@ const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
+const search = document.getElementById("search");
 
-/* активный трек */
+/* ACTIVE */
 function setActiveTrack(i){
   cards.forEach(c => c.classList.remove("active"));
   if(cards[i]) cards[i].classList.add("active");
 }
 
-/* загрузка */
+/* LOAD */
 function load(i){
   current = i;
 
@@ -228,8 +248,7 @@ function toggle(){
   }
 }
 
-audio.onended = next;
-
+/* PROGRESS */
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -237,12 +256,12 @@ audio.ontimeupdate = () => {
 };
 
 progress.oninput = () => {
-  if(audio.duration){
-    audio.currentTime = (progress.value / 100) * audio.duration;
-  }
+  audio.currentTime = (progress.value / 100) * audio.duration;
 };
 
-/* карточки */
+audio.onended = next;
+
+/* CARDS */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -259,7 +278,17 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* download */
+/* SEARCH */
+search.addEventListener("input", () => {
+  const value = search.value.toLowerCase();
+
+  tracks.forEach((t,i)=>{
+    const match = t.title.toLowerCase().includes(value);
+    cards[i].style.display = match ? "block" : "none";
+  });
+});
+
+/* DOWNLOAD */
 async function download(i){
   const t = tracks[i];
 
