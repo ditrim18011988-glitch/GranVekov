@@ -26,7 +26,6 @@ body{
   gap:10px;
 }
 
-/* SEARCH */
 #search{
   padding:8px 12px;
   border-radius:10px;
@@ -37,10 +36,9 @@ body{
   width:200px;
 }
 
-/* side buttons */
 .side{ width:60px; display:flex; justify-content:center; }
 
-/* LOGO — FIXED (ключевая проблема телефонов) */
+/* LOGO FIX */
 .logo{
   display:flex;
   justify-content:center;
@@ -51,10 +49,8 @@ body{
 .logo img{
   width:auto;
   height:auto;
-
   max-width: 90vw;
   max-height: 420px;
-
   border-radius:16px;
   display:block;
 }
@@ -166,7 +162,7 @@ button{
   width:100%;
 }
 
-/* ================= MOBILE FIX ================= */
+/* MOBILE */
 @media (max-width: 600px){
 
   .topbar{
@@ -176,13 +172,6 @@ button{
 
   #search{
     width:100%;
-  }
-
-  /* FIX LOGO MOBILE */
-  .logo img{
-    max-width: 90vw;
-    max-height: none;
-    width: 100%;
   }
 
   .container{
@@ -203,6 +192,12 @@ button{
 
   .controls{
     justify-content:space-between;
+  }
+
+  .logo img{
+    max-width:90vw;
+    max-height:none;
+    width:100%;
   }
 }
 </style>
@@ -284,9 +279,21 @@ function setActive(i){
 
 /* TOGGLE */
 function toggle(){
-  if(audio.paused) safePlay();
-  else audio.pause();
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
   syncUI();
+}
+
+/* 🔥 FIX: карточка теперь умеет toggle */
+function toggleCard(i){
+  if(i === current){
+    toggle();
+  } else {
+    load(i);
+  }
 }
 
 /* SYNC UI */
@@ -332,7 +339,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-    <button onclick="load(${i})">▶ Play</button>
+    <button onclick="toggleCard(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
