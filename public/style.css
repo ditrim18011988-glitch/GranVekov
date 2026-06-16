@@ -39,6 +39,7 @@ body {
   transform: scale(1.03);
 }
 
+/* ACTIONS */
 .actions {
   display: flex;
   gap: 10px;
@@ -68,8 +69,8 @@ body {
 }
 
 .logo img {
-  height: 420px !important;
-  width: auto !important;
+  width: auto;
+  height: 420px;
   max-width: 95vw;
   border-radius: 18px;
   animation: floatLogo 4s ease-in-out infinite;
@@ -151,7 +152,7 @@ body {
   transform: scale(1.05);
 }
 
-/* fade */
+/* FADE IN */
 @keyframes fadeIn {
   to {
     opacity: 1;
@@ -182,7 +183,7 @@ body {
   border-radius: 10px;
 }
 
-/* controls */
+/* CONTROLS */
 .controls {
   display: flex;
   gap: 10px;
@@ -204,7 +205,7 @@ body {
   transform: scale(1.05);
 }
 
-/* progress */
+/* PROGRESS */
 #progress {
   width: 100%;
   height: 4px;
@@ -278,14 +279,15 @@ button:active {
 }
 
 /* ========================= */
-/* ✅ MOBILE FIX (ВАЖНО) */
+/* MOBILE FIX (REAL WORKING) */
 /* ========================= */
-@media (max-width: 600px) {
 
-  /* topbar компактнее */
+@media (max-width: 768px) {
+
   .topbar {
     padding: 10px 12px;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
   #search {
@@ -298,31 +300,26 @@ button:active {
     font-size: 13px;
   }
 
-  /* логотип без перегруза */
   .logo {
-    margin: 18px 0;
+    margin: 20px 0;
   }
 
   .logo img {
-    height: auto !important;
-    width: 90vw !important;
-    max-width: 360px;
-    animation: none; /* убираем тряску на мобиле */
+    width: 90vw;
+    height: auto;
+    animation: none;
   }
 
-  /* сетка удобнее пальцами */
   .container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 12px;
+    gap: 10px;
+    padding: 10px;
   }
 
-  /* карточки компактнее */
   .card {
     padding: 10px;
   }
 
-  /* плеер вертикально */
   #player {
     flex-direction: column;
     align-items: stretch;
