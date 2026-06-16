@@ -28,7 +28,6 @@ body{
   gap:10px;
 }
 
-/* SEARCH */
 #search{
   padding:8px 12px;
   border-radius:10px;
@@ -39,18 +38,12 @@ body{
   width:200px;
 }
 
-#search:focus{
-  box-shadow:0 0 10px rgba(255,60,60,0.4);
-}
-
-/* side buttons */
 .side{
   width:60px;
   display:flex;
   justify-content:center;
 }
 
-/* LOGO */
 .logo{
   width:100%;
   display:flex;
@@ -88,7 +81,6 @@ body{
   transition: 0.25s ease;
 }
 
-/* active */
 .card.active{
   border:1px solid #ff3c3c;
   box-shadow:0 0 25px rgba(255,60,60,0.4);
@@ -194,7 +186,7 @@ const tracks = [
 
 let current = 0;
 let cards = [];
-let cardButtons = [];   // 🔥 ДОБАВИЛ
+let cardButtons = [];
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
@@ -222,14 +214,15 @@ function load(i){
   playBtn.innerText = "⏸";
 
   setActiveTrack(i);
+  updateCardButtons();
+}
 
-  // 🔥 обновляем кнопки карточек
-  cardButtons.forEach((btn, index) => {
-    if(index === i){
-      btn.innerText = "⏸ Playing";
-    } else {
-      btn.innerText = "▶ Play";
-    }
+/* обновление кнопок карточек */
+function updateCardButtons(){
+  cardButtons.forEach((btn, i) => {
+    btn.innerText = (i === current && !audio.paused)
+      ? "⏸ Playing"
+      : "▶ Play";
   });
 }
 
@@ -240,12 +233,11 @@ function toggle(){
   if(audio.paused){
     audio.play();
     playBtn.innerText = "⏸";
-    cardButtons[current].innerText = "⏸ Playing";
   } else {
     audio.pause();
     playBtn.innerText = "▶️";
-    cardButtons[current].innerText = "▶ Play";
   }
+  updateCardButtons();
 }
 
 /* PROGRESS */
@@ -276,8 +268,6 @@ tracks.forEach((t,i)=>{
 
   list.appendChild(div);
   cards.push(div);
-
-  // 🔥 сохраняем кнопку
   cardButtons.push(div.querySelector(".playBtnCard"));
 });
 
