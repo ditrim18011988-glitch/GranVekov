@@ -19,6 +19,7 @@ const tracks = [
 let current = 0;
 let cards = [];
 let cardPlayButtons = [];
+let isDownloading = false;
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
@@ -28,26 +29,21 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
-/* ===== АКТИВНЫЙ ТРЕК ===== */
+/* ===== ACTIVE TRACK ===== */
 function setActiveTrack(index) {
   cards.forEach(c => c.classList.remove("active"));
   if (cards[index]) cards[index].classList.add("active");
 }
 
-/* ===== ОБНОВЛЕНИЕ КНОПОК ===== */
+/* ===== CARD BUTTON SYNC ===== */
 function updateCardButtons(activeIndex, isPlaying) {
   cardPlayButtons.forEach((btn, i) => {
     if (!btn) return;
-
-    if (i === activeIndex) {
-      btn.innerText = isPlaying ? "⏸ Playing" : "▶ Play";
-    } else {
-      btn.innerText = "▶ Play";
-    }
+    btn.innerText = (i === activeIndex && isPlaying) ? "⏸ Playing" : "▶ Play";
   });
 }
 
-/* ===== ЗАГРУЗКА ТРЕКА ===== */
+/* ===== LOAD TRACK ===== */
 function load(i) {
   current = i;
 
@@ -71,7 +67,7 @@ function prev() {
   load((current - 1 + tracks.length) % tracks.length);
 }
 
-/* ===== PLAY / PAUSE ===== */
+/* ===== TOGGLE PLAY ===== */
 function toggle() {
   if (audio.paused) {
     audio.play();
@@ -84,7 +80,7 @@ function toggle() {
   }
 }
 
-/* ===== ПРОГРЕСС ПЛЕЕРА ===== */
+/* ===== PLAYER PROGRESS ===== */
 audio.ontimeupdate = () => {
   if (audio.duration) {
     progress.value = (audio.currentTime / audio.duration) * 100;
@@ -99,7 +95,7 @@ progress.oninput = () => {
 
 audio.onended = next;
 
-/* ===== СОЗДАНИЕ КАРТОЧЕК ===== */
+/* ===== CREATE CARDS ===== */
 tracks.forEach((t, i) => {
   const div = document.createElement("div");
   div.className = "card";
@@ -119,16 +115,19 @@ tracks.forEach((t, i) => {
 
   list.appendChild(div);
   cards.push(div);
-
   cardPlayButtons.push(div.querySelector(".playCardBtn"));
 });
 
-/* ===== СКАЧИВАНИЕ С ПРОГРЕССОМ ===== */
+/* ===== DOWNLOAD WITH PROGRESS ===== */
 function download(i) {
+  if (isDownloading) return; // защита от спама
+
   const t = tracks[i];
   const bar = cards[i].querySelector(".download-bar");
   const fill = bar.querySelector(".download-fill");
   const text = bar.querySelector("span");
+
+  isDownloading = true;
 
   const xhr = new XMLHttpRequest();
   xhr.open("GET", t.file, true);
@@ -136,8 +135,6 @@ function download(i) {
 
   fill.style.width = "0%";
   text.innerText = "0%";
-
-  bar.classList.add("loading");
 
   xhr.onprogress = (e) => {
     if (e.lengthComputable) {
@@ -163,14 +160,19 @@ function download(i) {
     setTimeout(() => {
       fill.style.width = "0%";
       text.innerText = "⬇ Скачать";
-      bar.classList.remove("loading");
-    }, 600);
+      isDownloading = false;
+    }, 500);
+  };
+
+  xhr.onerror = () => {
+    text.innerText = "Ошибка";
+    isDownloading = false;
   };
 
   xhr.send();
 }
 
-/* ===== ПОИСК ===== */
+/* ===== SEARCH ===== */
 searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase();
 
@@ -178,26 +180,16 @@ searchInput.addEventListener("input", () => {
 
   tracks.forEach((t, i) => {
     const match = t.title.toLowerCase().includes(value);
-
     cards[i].style.display = match ? "block" : "none";
-
     if (match) found = true;
   });
 
   list.style.opacity = (!found && value.length > 0) ? "0.5" : "1";
 });
 
-/* ===== ЭФФЕКТ КНОПОК ===== */
+/* ===== BUTTON EFFECTS ===== */
 document.querySelectorAll("button").forEach(btn => {
-  btn.addEventListener("mousedown", () => {
-    btn.style.transform = "scale(0.92)";
-  });
-
-  btn.addEventListener("mouseup", () => {
-    btn.style.transform = "";
-  });
-
-  btn.addEventListener("mouseleave", () => {
-    btn.style.transform = "";
-  });
+  btn.addEventListener("mousedown", () => btn.style.transform = "scale(0.92)");
+  btn.addEventListener("mouseup", () => btn.style.transform = "");
+  btn.addEventListener("mouseleave", () => btn.style.transform = "");
 });
