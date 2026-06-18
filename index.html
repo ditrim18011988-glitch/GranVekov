@@ -364,15 +364,17 @@ tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
 
-  div.innerHTML = `
-    <img src="${t.cover}">
-    <h3>${t.title}</h3>
-    <button onclick="toggleTrack(${i})">▶ Play</button>
-  `;
+ div.innerHTML = `
+  <img src="${t.cover}">
+  <h3>${t.title}</h3>
 
-  list.appendChild(div);
-  cards.push(div);
-});
+  <button onclick="toggleTrack(${i})">▶ Play</button>
+
+  <div class="downloadBtn" onclick="downloadTrack(${i})">
+    <div class="fill"></div>
+    <span>⬇ Скачать</span>
+  </div>
+`;
 
 /* ================= PLAYER BUTTONS ================= */
 document.getElementById("togglePlayer").onclick = () => {
