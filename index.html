@@ -105,7 +105,6 @@ button{
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
 }
 
-/* STATS */
 .stats{
   margin-top:6px;
   font-size:13px;
@@ -115,7 +114,7 @@ button{
   gap:10px;
 }
 
-/* PLAYER FIX (ВАЖНО) */
+/* PLAYER FIX */
 #player{
   position:fixed;
   left:0;
@@ -204,11 +203,11 @@ const tracks = [
   {title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg"},
   {title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg"},
   {title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg"},
-  {title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg"},
+  {title:"Белоснежка", file:"music/track6.mp3", cover:"music/cover6.jpg"},
   {title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg"},
   {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"},
-  {title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg"},
-  {title:"Питер Пэн-похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg"},
+  {title:"Распутин", file:"music/track9.mp3", cover:"music/cover9.jpg"},
+  {title:"Питер Пэн", file:"music/track10.mp3", cover:"music/cover10.jpg"},
   {title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg"},
   {title:"Аид", file:"music/track12.mp3", cover:"music/cover12.jpg"},
   {title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"},
@@ -229,24 +228,9 @@ function safePlay(){
   audio.play().catch(()=>{});
 }
 
-/* FIREBASE */
-function addPlay(i){
-  db.collection("stats").doc(String(i)).set({
-    plays: firebase.firestore.FieldValue.increment(1)
-  }, {merge:true});
-}
-
-function addDownload(i){
-  db.collection("stats").doc(String(i)).set({
-    downloads: firebase.firestore.FieldValue.increment(1)
-  }, {merge:true});
-}
-
-/* LOAD */
+/* LOAD TRACK */
 function load(i){
   current = i;
-
-  addPlay(i);
 
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
@@ -256,22 +240,42 @@ function load(i){
   syncUI();
 }
 
-/* TOGGLE */
+/* TOGGLE (ИСПРАВЛЕНО) */
 function toggle(){
-  if(current === -1) return load(0);
+  if(current === -1){
+    load(0);
+    return;
+  }
 
   if(audio.paused){
     safePlay();
   } else {
     audio.pause();
   }
+
   syncUI();
 }
 
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* UI FIX (ВАЖНО) */
+/* 🔥 ГЛАВНЫЙ FIX */
+function toggleTrack(i){
+  if(i !== current){
+    load(i);
+    return;
+  }
+
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
+
+  syncUI();
+}
+
+/* UI SYNC */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
@@ -288,7 +292,7 @@ function syncUI(){
   });
 }
 
-/* EVENTS */
+/* EVENTS (СТАБИЛЬНОСТЬ) */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 
@@ -302,11 +306,11 @@ tracks.forEach((t,i)=>{
     <h3>${t.title}</h3>
 
     <div class="stats">
-      👁 <span id="p${i}">0</span>
-      ⬇ <span id="d${i}">0</span>
+      👁 0
+      ⬇ 0
     </div>
 
-    <button onclick="load(${i})">▶ Play</button>
+    <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -337,16 +341,14 @@ function downloadTrack(i){
   xhr.onload=()=>{
     const url = URL.createObjectURL(xhr.response);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = t.title + ".mp3";
-
-    addDownload(i);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=t.title+".mp3";
 
     a.click();
     URL.revokeObjectURL(url);
 
-    fill.style.width = "0%";
+    fill.style.width="0%";
   };
 
   xhr.send();
@@ -362,14 +364,9 @@ document.getElementById("search").addEventListener("input",(e)=>{
   });
 });
 
-/* ADS / DONATE */
-function ads(){
-  alert("Реклама");
-}
-
-function donate(){
-  window.open("https://paypal.me/yourlink");
-}
+/* PLACEHOLDERS */
+function ads(){ alert("Реклама"); }
+function donate(){ alert("Донат"); }
 </script>
 
 </body>
