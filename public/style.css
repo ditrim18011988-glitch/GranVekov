@@ -199,4 +199,28 @@ button {
     width: 44px;
     height: 44px;
   }
+  /* ===== DOWNLOAD CURSOR HARD FIX ===== */
+
+.downloadBtn {
+  position: relative;
+  z-index: 10;
+}
+
+.downloadBtn,
+.downloadBtn * {
+  cursor: url("music/rock-cursor.png"), pointer !important;
+}
+
+/* слой заливки НЕ должен перехватывать мышь */
+.downloadBtn .fill {
+  pointer-events: none !important;
+  z-index: 0;
+}
+
+/* текст поверх */
+.downloadBtn span {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
 }
