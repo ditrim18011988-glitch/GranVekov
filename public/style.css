@@ -102,6 +102,9 @@ button {
   justify-content: center;
 
   cursor: url("music/rock-cursor.png"), pointer;
+
+  /* 🔥 ВАЖНО: создаём правильный слой */
+  z-index: 1;
 }
 
 /* ГЛАВНЫЙ ФИКС КУРСОРА */
@@ -110,7 +113,7 @@ button {
   cursor: url("music/rock-cursor.png"), pointer !important;
 }
 
-/* ЗАЛИВКА */
+/* 🔥 ГЛАВНЫЙ ФИКС БАГА (ВОТ ОН) */
 .downloadBtn .fill {
   position: absolute;
   left: 0;
@@ -120,16 +123,19 @@ button {
   background: linear-gradient(90deg, #ff3c3c, #ff7a7a);
   transition: width 0.2s linear;
 
+  /* ❗ ВАЖНЕЙШЕЕ ИСПРАВЛЕНИЕ */
   pointer-events: none;
+  z-index: 0;
 }
 
 /* TEXT */
 .downloadBtn span {
   position: relative;
   z-index: 2;
+  pointer-events: none;
 }
 
-/* 🔥 ДОБАВЛЕНО ДЛЯ ДИАГНОСТИКИ */
+/* 🔥 ВАЖНО: чтобы hover всегда работал */
 .downloadBtn:hover {
   outline: 2px solid red;
 }
