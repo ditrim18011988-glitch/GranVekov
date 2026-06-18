@@ -23,7 +23,6 @@ body{
   align-items:center;
   padding:10px 20px;
   background:#111;
-  gap:10px;
 }
 
 #search{
@@ -35,8 +34,6 @@ body{
   color:white;
   width:200px;
 }
-
-.side{ width:60px; display:flex; justify-content:center; }
 
 .logo{
   display:flex;
@@ -52,7 +49,7 @@ body{
 
 .container{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:20px;
   padding:20px;
 }
@@ -63,7 +60,7 @@ body{
   padding:12px;
   opacity:0;
   transform:translateY(12px);
-  animation:fadeIn 0.5s ease forwards;
+  animation:fadeIn .5s ease forwards;
 }
 
 .card.active{
@@ -72,7 +69,7 @@ body{
 }
 
 @keyframes fadeIn{
-  to{ opacity:1; transform:translateY(0); }
+  to{opacity:1;transform:translateY(0);}
 }
 
 .card img{
@@ -114,15 +111,9 @@ button{
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
 }
 
-.downloadBtn span{
-  position:relative;
-  z-index:2;
-}
-
-/* ===== ДОБАВЛЕНО: СТАТИСТИКА ===== */
 .stats{
   margin-top:6px;
-  font-size:14px;
+  font-size:13px;
   opacity:0.8;
   display:flex;
   justify-content:center;
@@ -140,7 +131,7 @@ button{
   gap:12px;
   padding:10px 14px;
   background:rgba(10,10,18,0.95);
-  backdrop-filter: blur(20px);
+  backdrop-filter:blur(20px);
   border-top:1px solid rgba(255,255,255,0.06);
   height:92px;
   box-sizing:border-box;
@@ -171,29 +162,51 @@ button{
   border-radius:8px;
   padding:6px 10px;
 }
-
-@media (max-width:768px){
-  .container{ grid-template-columns:repeat(2,1fr); }
-  #search{ width:100%; }
-}
 </style>
 </head>
 
 <body>
 
-<script>
+<div class="topbar">
+  <input id="search" placeholder="Поиск музыки...">
+</div>
 
+<div class="logo">
+  <img src="music/logo.png">
+</div>
+
+<div class="container" id="list"></div>
+
+<div id="player">
+  <img id="cover">
+  <div style="flex:1">
+    <div id="title">Выбери трек</div>
+
+    <div class="controls">
+      <button onclick="prev()">⏮</button>
+      <button onclick="toggle()" id="playBtn">▶️</button>
+      <button onclick="next()">⏭</button>
+    </div>
+
+    <input id="progress" type="range" value="0">
+  </div>
+
+  <button id="togglePlayer">▾</button>
+  <audio id="audio"></audio>
+</div>
+
+<script>
 const tracks = [
   {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
   {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
   {title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg"},
   {title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg"},
   {title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg"},
-  {title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg"},
+  {title:"Белоснежка", file:"music/track6.mp3", cover:"music/cover6.jpg"},
   {title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg"},
   {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"},
-  {title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg"},
-  {title:"Питер Пэн-похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg"},
+  {title:"Распутин", file:"music/track9.mp3", cover:"music/cover9.jpg"},
+  {title:"Питер Пэн", file:"music/track10.mp3", cover:"music/cover10.jpg"},
   {title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg"},
   {title:"Аид", file:"music/track12.mp3", cover:"music/cover12.jpg"},
   {title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"},
@@ -203,147 +216,90 @@ const tracks = [
 let current = -1;
 let cards = [];
 
-/* ================= STATS ================= */
-const stats = JSON.parse(localStorage.getItem("stats") || "{}");
-
-function initStats(i){
-  if(!stats[i]){
-    stats[i] = { plays: 0, downloads: 0 };
-  }
-}
-
-function saveStats(){
-  localStorage.setItem("stats", JSON.stringify(stats));
-}
-
-function renderStats(i){
-  const p = document.getElementById("p"+i);
-  const d = document.getElementById("d"+i);
-
-  if(p) p.textContent = stats[i]?.plays || 0;
-  if(d) d.textContent = stats[i]?.downloads || 0;
-}
-
-/* ================= ELEMENTS ================= */
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
-const searchInput = document.getElementById("search");
+const search = document.getElementById("search");
 
-/* ================= SAFE PLAY ================= */
+/* STATS */
+const stats = JSON.parse(localStorage.getItem("stats") || "{}");
+function saveStats(){ localStorage.setItem("stats", JSON.stringify(stats)); }
+
+/* PLAY */
 function safePlay(){
-  const p = audio.play();
-  if(p) p.catch(()=>{});
+  audio.play().catch(()=>{});
 }
 
-/* ================= LOAD ================= */
 function load(i){
   current = i;
 
-  initStats(i);
+  stats[i] = stats[i] || {plays:0, downloads:0};
+  stats[i].plays++;
+  saveStats();
 
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
 
-  /* 👁 +1 просмотр */
-  stats[i].plays++;
-  saveStats();
-
-  renderStats(i);
-
   safePlay();
   syncUI();
 }
 
-/* ================= TRACK CLICK ================= */
+/* TOGGLE */
 function toggleTrack(i){
-  if(i !== current){
-    load(i);
-    return;
-  }
-
-  if(audio.paused) safePlay();
-  else audio.pause();
-
+  if(i !== current) return load(i);
+  audio.paused ? safePlay() : audio.pause();
   syncUI();
 }
 
-/* ================= MAIN BUTTON ================= */
 function toggle(){
-  if(current === -1){
-    load(0);
-    return;
-  }
-
-  if(audio.paused) safePlay();
-  else audio.pause();
-
+  if(current === -1) return load(0);
+  audio.paused ? safePlay() : audio.pause();
   syncUI();
 }
 
-/* ================= NEXT / PREV ================= */
-function next(){
-  if(current === -1) return load(0);
-  load((current + 1) % tracks.length);
-}
+function next(){ load((current+1)%tracks.length); }
+function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-function prev(){
-  if(current === -1) return load(0);
-  load((current - 1 + tracks.length) % tracks.length);
-}
-
-/* ================= UI ================= */
+/* UI */
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
-
-    if(i === current && !audio.paused){
-      btn.textContent = "⏸ Pause";
-      c.classList.add("active");
-    } else {
-      btn.textContent = "▶ Play";
-      c.classList.remove("active");
-    }
+    btn.textContent = (i===current && !audio.paused) ? "⏸ Pause" : "▶ Play";
+    c.classList.toggle("active", i===current && !audio.paused);
   });
 }
 
-/* ================= EVENTS ================= */
-audio.addEventListener("play", syncUI);
-audio.addEventListener("pause", syncUI);
+/* EVENTS */
+audio.addEventListener("timeupdate",()=>{
+  if(audio.duration){
+    progress.value = (audio.currentTime/audio.duration)*100;
+  }
+});
+
+progress.oninput=()=>{
+  audio.currentTime=(progress.value/100)*audio.duration;
+};
+
 audio.addEventListener("ended", next);
 
-/* ================= PROGRESS ================= */
-audio.ontimeupdate = () => {
-  if(audio.duration){
-    progress.value = (audio.currentTime / audio.duration) * 100;
-  }
-};
-
-progress.oninput = () => {
-  audio.currentTime = (progress.value / 100) * audio.duration;
-};
-
-/* ================= BUILD CARDS ================= */
+/* CARDS */
 tracks.forEach((t,i)=>{
-  const div = document.createElement("div");
-  div.className = "card";
+  const div=document.createElement("div");
+  div.className="card";
 
-  initStats(i);
-
-  div.innerHTML = `
+  div.innerHTML=`
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
     <div class="stats">
-      👁 <span id="p${i}">${stats[i]?.plays || 0}</span>
-      &nbsp;&nbsp;
-      ⬇ <span id="d${i}">${stats[i]?.downloads || 0}</span>
+      👁 ${stats[i]?.plays || 0}
+      ⬇ ${stats[i]?.downloads || 0}
     </div>
 
     <button onclick="toggleTrack(${i})">▶ Play</button>
@@ -358,74 +314,59 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ================= DOWNLOAD ================= */
+/* DOWNLOAD */
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
   const fill = card.querySelector(".fill");
 
-  initStats(i);
-
   const xhr = new XMLHttpRequest();
-  xhr.open("GET", t.file, true);
+  xhr.open("GET", t.file);
   xhr.responseType = "blob";
 
-  xhr.onprogress = (e) => {
+  xhr.onprogress=e=>{
     if(e.lengthComputable){
-      fill.style.width = (e.loaded / e.total) * 100 + "%";
+      fill.style.width=(e.loaded/e.total)*100+"%";
     }
   };
 
-  xhr.onload = () => {
-    const url = URL.createObjectURL(xhr.response);
+  xhr.onload=()=>{
+    const url=URL.createObjectURL(xhr.response);
 
-    const a = document.createElement("a");
-    a.href = url;
+    const a=document.createElement("a");
+    a.href=url;
 
-    const safeName = t.title.replace(/[\/\\:*?"<>|]/g, "").trim();
-    a.download = safeName + ".mp3";
+    const name=t.title.replace(/[\/\\:*?"<>|]/g,"").trim();
 
-    /* ⬇ +1 скачивание */
+    a.download=name+".mp3";
+
+    stats[i] = stats[i] || {plays:0, downloads:0};
     stats[i].downloads++;
     saveStats();
-    renderStats(i);
 
     a.click();
-
     URL.revokeObjectURL(url);
-    fill.style.width = "0%";
-  };
 
-  xhr.onerror = () => {
-    alert("Ошибка скачивания");
-    fill.style.width = "0%";
+    fill.style.width="0%";
   };
 
   xhr.send();
 }
 
-/* ================= SEARCH ================= */
-searchInput.addEventListener("input", () => {
-  const value = searchInput.value.toLowerCase().trim();
+/* SEARCH */
+search.addEventListener("input",()=>{
+  const v=search.value.toLowerCase().trim();
 
-  cards.forEach(card => {
-    const titleText = card.querySelector("h3").textContent.toLowerCase();
-    card.style.display = titleText.includes(value) ? "block" : "none";
+  cards.forEach(c=>{
+    const name=c.querySelector("h3").textContent.toLowerCase();
+    c.style.display=name.includes(v)?"block":"none";
   });
 });
 
-/* ================= UI BUTTONS ================= */
-document.getElementById("togglePlayer").onclick = () => {
+/* PLAYER */
+document.getElementById("togglePlayer").onclick=()=>{
   document.getElementById("player").classList.toggle("collapsed");
 };
-
-function donate(){
-  window.open("https://paypal.me/yourlink");
-}
-
-function ads(){
-  alert("Реклама");
-}
 </script>
 
 </body>
