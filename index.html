@@ -165,7 +165,7 @@ button{
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <script>
-/* 🔥 ВСТАВЬ СЮДА СВОЙ FIREBASE CONFIG */
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
@@ -175,7 +175,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* TRACKS */
+/* ================= TRACKS ================= */
 const tracks = [
   {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
   {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
@@ -196,12 +196,12 @@ const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const list = document.getElementById("list");
 
-/* SAFE PLAY */
+/* ================= SAFE PLAY ================= */
 function safePlay(){
   audio.play().catch(()=>{});
 }
 
-/* FIREBASE STATS */
+/* ================= FIXED FIREBASE STATS ================= */
 function addPlay(i){
   db.collection("stats").doc(String(i)).set({
     plays: firebase.firestore.FieldValue.increment(1)
@@ -219,12 +219,13 @@ function listenStats(i){
     const d = doc.data() || {};
     const p = document.getElementById("p"+i);
     const dwn = document.getElementById("d"+i);
+
     if(p) p.textContent = d.plays || 0;
     if(dwn) dwn.textContent = d.downloads || 0;
   });
 }
 
-/* LOAD */
+/* ================= LOAD ================= */
 function load(i){
   current = i;
 
@@ -237,7 +238,7 @@ function load(i){
   safePlay();
 }
 
-/* UI */
+/* ================= UI ================= */
 function toggle(){
   if(current === -1) load(0);
   else audio.paused ? safePlay() : audio.pause();
@@ -246,7 +247,7 @@ function toggle(){
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* CARDS */
+/* ================= CARDS ================= */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -274,7 +275,7 @@ tracks.forEach((t,i)=>{
   listenStats(i);
 });
 
-/* DOWNLOAD */
+/* ================= DOWNLOAD ================= */
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
@@ -286,16 +287,16 @@ function downloadTrack(i){
 
   xhr.onprogress=e=>{
     if(e.lengthComputable){
-      fill.style.width = (e.loaded/e.total)*100+"%";
+      fill.style.width=(e.loaded/e.total)*100+"%";
     }
   };
 
   xhr.onload=()=>{
     const url = URL.createObjectURL(xhr.response);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = t.title + ".mp3";
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=t.title+".mp3";
 
     addDownload(i);
 
@@ -308,11 +309,12 @@ function downloadTrack(i){
   xhr.send();
 }
 
-/* SEARCH */
+/* ================= SEARCH ================= */
 document.getElementById("search").addEventListener("input",(e)=>{
-  const v = e.target.value.toLowerCase();
+  const v=e.target.value.toLowerCase();
+
   cards.forEach(c=>{
-    const t = c.querySelector("h3").textContent.toLowerCase();
+    const t=c.querySelector("h3").textContent.toLowerCase();
     c.style.display = t.includes(v) ? "block" : "none";
   });
 });
