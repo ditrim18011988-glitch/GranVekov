@@ -1,208 +1,230 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle at top, #141427, #07070c);
-  color: white;
-  cursor: url("music/rock-cursor.png"), auto;
-
-  /* safe-area + запас под плеер */
-  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:radial-gradient(circle at top,#141427,#07070c);
+  color:white;
+  cursor:url("music/rock-cursor.png"),auto;
+  padding-bottom:calc(120px + env(safe-area-inset-bottom));
 }
 
 /* TOPBAR */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: rgba(15, 15, 25, 0.6);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 20px;
+  background:rgba(15,15,25,.6);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.side{
+  width:60px;
+  display:flex;
+  justify-content:center;
 }
 
 /* SEARCH */
-#search {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  background: #1b1b2a;
-  color: white;
-  width: 220px;
-  transition: 0.2s;
+
+#search{
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  background:#1b1b2a;
+  color:white;
+  width:220px;
+  transition:.2s;
 }
 
 /* LOGO */
-.logo {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0;
-  padding: 0 10px;
+
+.logo{
+  display:flex;
+  justify-content:center;
+  margin:30px 0;
+  padding:0 10px;
 }
 
-.logo img {
-  width: auto;
-  height: 420px;
-  max-width: 95vw;
-  border-radius: 16px;
-  display: block;
+.logo img{
+  width:auto;
+  height:420px;
+  max-width:95vw;
+  border-radius:16px;
+  display:block;
 }
 
 /* GRID */
-.container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  padding-bottom: 200px;
+
+.container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  padding:20px;
+  padding-bottom:220px;
 }
 
 /* CARD */
-.card {
-  background: #1a1a25;
-  border-radius: 16px;
-  padding: 12px;
 
-  opacity: 0;
-  transform: translateY(12px);
-  animation: fadeIn 0.5s ease forwards;
+.card{
+  background:#1a1a25;
+  border-radius:16px;
+  padding:12px;
+
+  opacity:0;
+  transform:translateY(12px);
+  animation:fadeIn .5s ease forwards;
 }
 
-.card img {
-  width: 100%;
-  border-radius: 12px;
+.card.active{
+  border:1px solid #ff3c3c;
+  box-shadow:0 0 25px rgba(255,60,60,.4);
 }
 
-@keyframes fadeIn {
-  to { opacity: 1; transform: translateY(0); }
+.card img{
+  width:100%;
+  border-radius:12px;
+}
+
+@keyframes fadeIn{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 /* BUTTON */
-button {
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #ff3c3c;
-  color: white;
-  cursor: pointer;
+
+button{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#ff3c3c;
+  color:white;
+  cursor:pointer;
 }
 
 /* DOWNLOAD */
-.download-bar {
-  position: relative;
-  height: 40px;
-  margin-top: 8px;
-  border-radius: 10px;
-  overflow: hidden;
 
-  background: #222236;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.downloadBtn{
+  position:relative;
+  overflow:hidden;
+  border-radius:10px;
+  height:40px;
+  margin-top:8px;
+  background:#222236;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
 }
 
-.download-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ff3c3c, #ff7a7a);
-  transition: width 0.1s linear;
+.downloadBtn .fill{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
+  transition:width .2s linear;
 }
 
-.download-bar span {
-  position: relative;
-  z-index: 2;
+.downloadBtn span{
+  position:relative;
+  z-index:2;
 }
 
-/* =========================
-   PLAYER (MAIN + MINI MODE)
-========================= */
+/* PLAYER */
 
-#player {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+#player{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
 
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display:flex;
+  align-items:center;
+  gap:14px;
 
-  padding: 12px 18px;
-  background: rgba(10,10,18,0.95);
-  backdrop-filter: blur(20px);
+  padding:12px 18px;
+  background:rgba(10,10,18,.95);
+  backdrop-filter:blur(20px);
 
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top:1px solid rgba(255,255,255,.06);
 
-  height: 92px;
-  box-sizing: border-box;
-  z-index: 999;
+  height:92px;
+  box-sizing:border-box;
+  z-index:999;
 
-  transition: 0.25s ease;
+  transition:.25s ease;
 
-  /* safe-area iPhone */
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  padding-bottom:calc(12px + env(safe-area-inset-bottom));
 }
 
-/* 🔥 COLLAPSED MODE (мини-плеер) */
-#player.collapsed {
-  height: 54px;
-  padding: 8px 12px;
+#player.collapsed{
+  height:54px;
+  overflow:hidden;
 }
 
 #player.collapsed #cover,
 #player.collapsed .controls,
-#player.collapsed #progress {
-  display: none;
+#player.collapsed #progress{
+  display:none;
 }
 
-/* в мини-режиме оставляем только текст */
-#player.collapsed #title {
-  font-size: 14px;
+#player.collapsed #title{
+  font-size:14px;
 }
 
-/* COVER */
-#cover {
-  width: 58px;
-  height: 58px;
-  border-radius: 10px;
+#cover{
+  width:58px;
+  height:58px;
+  border-radius:10px;
 }
 
-/* CONTROLS */
-.controls {
-  display: flex;
-  gap: 10px;
+.controls{
+  display:flex;
+  gap:10px;
 }
 
-/* PROGRESS */
-#progress {
-  width: 100%;
-  height: 4px;
+#progress{
+  width:100%;
+  height:4px;
 }
 
-/* ================= MOBILE ================= */
+#togglePlayer{
+  background:#222236;
+  color:white;
+  border:none;
+  border-radius:8px;
+  padding:6px 10px;
+  cursor:pointer;
+}
 
-@media (max-width: 768px) {
+/* MOBILE */
 
-  body {
-    padding-bottom: calc(140px + env(safe-area-inset-bottom));
+@media (max-width:768px){
+
+  body{
+    padding-bottom:calc(140px + env(safe-area-inset-bottom));
   }
 
-  .container {
-    grid-template-columns: repeat(2, 1fr);
-    padding-bottom: 240px;
+  .container{
+    grid-template-columns:repeat(2,1fr);
+    padding-bottom:240px;
   }
 
-  #search {
-    width: 100%;
+  #search{
+    width:100%;
   }
 
-  #cover {
-    width: 44px;
-    height: 44px;
+  #cover{
+    width:44px;
+    height:44px;
   }
 }
