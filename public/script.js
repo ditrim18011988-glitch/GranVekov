@@ -167,3 +167,36 @@ searchInput.addEventListener("input", () => {
       : "none";
   });
 });
+function downloadTrack(i){
+  const t = tracks[i];
+
+  fetch(t.file)
+    .then(res => {
+      if(!res.ok) throw new Error("File not found");
+      return res.blob();
+    })
+    .then(blob => {
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+
+      // 🔥 НОРМАЛЬНОЕ ИМЯ ФАЙЛА
+      const safeName = t.title
+        .replace(/[\/\\:*?"<>|]/g, "")  // убираем запрещённые символы
+        .trim();
+
+      a.download = `${safeName}.mp3`;
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+      console.error("Download error:", err);
+      alert("Не удалось скачать файл");
+    });
+}
