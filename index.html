@@ -14,8 +14,6 @@ body{
   background:#0b0b10;
   color:white;
   cursor: url("music/rock-cursor.png"), auto;
-
-  /* safe-area + плеер */
   padding-bottom: calc(140px + env(safe-area-inset-bottom));
 }
 
@@ -46,14 +44,11 @@ body{
   display:flex;
   justify-content:center;
   margin:30px 0;
-  padding:0 10px;
 }
 
 .logo img{
-  width:auto;
-  height:auto;
-  max-width: 90vw;
-  max-height: 420px;
+  max-width:90vw;
+  max-height:420px;
   border-radius:16px;
   display:block;
 }
@@ -132,36 +127,27 @@ button{
   z-index:2;
 }
 
-/* ================= PLAYER ================= */
-
+/* PLAYER */
 #player{
   position:fixed;
   left:0;
   right:0;
   bottom:0;
-
   display:flex;
   align-items:center;
   gap:12px;
-
   padding:10px 14px;
   background:rgba(10,10,18,0.95);
   backdrop-filter: blur(20px);
-
   border-top:1px solid rgba(255,255,255,0.06);
-
   height:92px;
   box-sizing:border-box;
   z-index:999;
-
   transition:0.25s ease;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
-/* COLLAPSED */
 #player.collapsed{
   height:52px;
-  overflow:hidden;
 }
 
 #player.collapsed #cover,
@@ -170,30 +156,22 @@ button{
   display:none;
 }
 
-#player.collapsed #title{
-  font-size:14px;
-}
-
-/* COVER */
 #cover{
   width:58px;
   height:58px;
   border-radius:10px;
 }
 
-/* CONTROLS */
 .controls{
   display:flex;
   gap:10px;
 }
 
-/* PROGRESS */
 #progress{
   width:100%;
   height:4px;
 }
 
-/* TOGGLE BUTTON */
 #togglePlayer{
   margin-left:auto;
   background:#222236;
@@ -204,17 +182,11 @@ button{
   cursor:pointer;
 }
 
-/* MOBILE */
 @media (max-width:768px){
-
   .container{
     grid-template-columns:repeat(2,1fr);
-    padding-bottom:260px;
   }
-
-  #search{
-    width:100%;
-  }
+  #search{ width:100%; }
 }
 </style>
 </head>
@@ -235,7 +207,6 @@ button{
 
 <div id="player">
   <img id="cover">
-
   <div style="flex:1">
     <div id="title">Выбери трек</div>
 
@@ -286,7 +257,7 @@ function safePlay(){
   if(p && p.catch) p.catch(()=>{});
 }
 
-/* ================= LOAD ================= */
+/* LOAD */
 function load(i){
   current = i;
   audio.src = tracks[i].file;
@@ -297,59 +268,36 @@ function load(i){
   syncUI();
 }
 
-/* ================= TOGGLE CURRENT TRACK (ВАЖНО) ================= */
-function toggleTrack(i){
-
-  if(i !== current){
-    load(i);
-    return;
-  }
-
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
-
-  syncUI();
-}
-
-/* ================= MAIN BUTTON ================= */
+/* TOGGLE */
 function toggle(){
   if(audio.paused) safePlay();
   else audio.pause();
-
-  syncUI();
 }
 
-/* ================= NEXT / PREV ================= */
+/* NEXT / PREV */
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* ================= UI ================= */
+/* UI */
 function syncUI(){
-
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
+    btn.textContent = (i === current && !audio.paused)
+      ? "⏸ Pause"
+      : "▶ Play";
 
-    if(i === current && !audio.paused){
-      btn.textContent = "⏸ Pause";
-      c.classList.add("active");
-    } else {
-      btn.textContent = "▶ Play";
-      c.classList.remove("active");
-    }
+    c.classList.toggle("active", i === current);
   });
 }
 
-/* ================= EVENTS ================= */
+/* EVENTS */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 audio.addEventListener("ended", next);
 
-/* ================= PROGRESS ================= */
+/* PROGRESS */
 audio.ontimeupdate = () => {
   if(audio.duration){
     progress.value = (audio.currentTime/audio.duration)*100;
@@ -360,24 +308,50 @@ progress.oninput = () => {
   audio.currentTime = (progress.value/100)*audio.duration;
 };
 
-/* ================= CARDS ================= */
+/* CARDS */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
 
- div.innerHTML = `
-  <img src="${t.cover}">
-  <h3>${t.title}</h3>
+  div.innerHTML = `
+    <img src="${t.cover}">
+    <h3>${t.title}</h3>
+    <button onclick="load(${i})">▶ Play</button>
 
-  <button onclick="toggleTrack(${i})">▶ Play</button>
+    <div class="downloadBtn" onclick="downloadTrack(${i})">
+      <div class="fill"></div>
+      <span>⬇ Скачать</span>
+    </div>
+  `;
 
-  <div class="downloadBtn" onclick="downloadTrack(${i})">
-    <div class="fill"></div>
-    <span>⬇ Скачать</span>
-  </div>
-`;
+  list.appendChild(div);
+  cards.push(div);
+});
 
-/* ================= PLAYER BUTTONS ================= */
+/* DOWNLOAD */
+function downloadTrack(i){
+  const t = tracks[i];
+
+  fetch(t.file)
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+
+      const safeName = t.title.replace(/[\/\\:*?"<>|]/g,"").trim();
+      a.download = safeName + ".mp3";
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    });
+}
+
+/* PLAYER BUTTON */
 document.getElementById("togglePlayer").onclick = () => {
   document.getElementById("player").classList.toggle("collapsed");
 };
