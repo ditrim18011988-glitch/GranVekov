@@ -116,7 +116,7 @@ button {
   z-index: 2;
 }
 
-/* DOWNLOAD BUTTON FIX (ВАЖНО) */
+/* DOWNLOAD BUTTON FIX (ИСПРАВЛЕНО) */
 .downloadBtn {
   position: relative;
   overflow: hidden;
@@ -124,16 +124,18 @@ button {
   height: 40px;
   margin-top: 8px;
   background: #222236;
-  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  cursor: url("music/rock-cursor.png"), pointer;
 }
 
-/* ✅ ЕДИНСТВЕННО ПРАВИЛЬНЫЙ ФИКС */
+/* КУРСОР НА ВСЁ ВНУТРИ */
 .downloadBtn,
 .downloadBtn * {
-  cursor: pointer !important;
+  cursor: url("music/rock-cursor.png"), pointer !important;
 }
 
 .downloadBtn .fill {
