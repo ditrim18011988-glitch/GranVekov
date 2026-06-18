@@ -25,11 +25,13 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const searchInput = document.getElementById("search");
 
+/* ================= SAFE PLAY ================= */
 function safePlay(){
   const p = audio.play();
-  if (p && p.catch) p.catch(()=>{});
+  if(p && p.catch) p.catch(()=>{});
 }
 
+/* ================= LOAD TRACK ================= */
 function load(i){
   current = i;
 
@@ -41,89 +43,80 @@ function load(i){
   syncUI();
 }
 
+/* ================= CARD CLICK ================= */
 function toggleTrack(i){
 
+  // другой трек
   if(i !== current){
     load(i);
     return;
   }
 
+  // тот же трек → play/pause
   if(audio.paused){
     safePlay();
-  }else{
+  } else {
     audio.pause();
   }
 
   syncUI();
 }
 
+/* ================= PLAYER BUTTON ================= */
 function toggle(){
   if(audio.paused){
     safePlay();
-  }else{
+  } else {
     audio.pause();
   }
 
   syncUI();
 }
 
-function next(){
-  if(current < 0){
-    load(0);
-  }else{
-    load((current + 1) % tracks.length);
-  }
-}
-
-function prev(){
-  if(current < 0){
-    load(0);
-  }else{
-    load((current - 1 + tracks.length) % tracks.length);
-  }
-}
-
+/* ================= UI SYNC ================= */
 function syncUI(){
 
-  playBtn.textContent = audio.paused ? "▶️" : "⏸";
+  const isPlaying = !audio.paused;
 
-  cards.forEach((card, i)=>{
+  playBtn.textContent = isPlaying ? "⏸" : "▶️";
 
-    const btn = card.querySelector(".playBtn");
+  cards.forEach((c,i)=>{
+    const btn = c.querySelector("button");
+    if(!btn) return;
 
-    if(btn){
-      if(i === current){
-        btn.textContent = audio.paused ? "▶ Play" : "⏸ Pause";
-      }else{
-        btn.textContent = "▶ Play";
-      }
+    if(i === current){
+      btn.textContent = isPlaying ? "⏸ Pause" : "▶ Play";
+    } else {
+      btn.textContent = "▶ Play";
     }
 
-    card.classList.toggle("active", i === current);
+    c.classList.toggle("active", i === current);
   });
 }
 
+/* ================= EVENTS ================= */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 
-audio.addEventListener("ended", ()=>{
-  next();
+audio.addEventListener("ended", () => {
+  if(current >= 0){
+    load((current + 1) % tracks.length);
+  }
 });
 
-audio.ontimeupdate = ()=>{
+/* ================= PROGRESS ================= */
+audio.ontimeupdate = () => {
   if(audio.duration){
-    progress.value =
-      (audio.currentTime / audio.duration) * 100;
+    progress.value = (audio.currentTime / audio.duration) * 100;
   }
 };
 
-progress.oninput = ()=>{
-  audio.currentTime =
-    (progress.value / 100) * audio.duration;
+progress.oninput = () => {
+  audio.currentTime = (progress.value / 100) * audio.duration;
 };
-/* ================= CARDS ================= */
 
-tracks.forEach((t, i) => {
+/* ================= CARDS ================= */
+tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
 
@@ -131,7 +124,7 @@ tracks.forEach((t, i) => {
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
-    <button class="playBtn" onclick="toggleTrack(${i})">▶ Play</button>
+    <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -143,8 +136,7 @@ tracks.forEach((t, i) => {
   cards.push(div);
 });
 
-/* ================= DOWNLOAD ================= */
-
+/* ================= DOWNLOAD (ВОЗВРАТ НОРМАЛЬНОЙ ВЕРСИИ) ================= */
 function downloadTrack(i){
   const t = tracks[i];
 
@@ -161,19 +153,16 @@ function downloadTrack(i){
       a.remove();
 
       URL.revokeObjectURL(url);
-    })
-    .catch(err => {
-      console.log("download error:", err);
     });
 }
 
 /* ================= SEARCH ================= */
-
 searchInput.addEventListener("input", () => {
   const v = searchInput.value.toLowerCase();
 
-  cards.forEach((c, i) => {
-    const ok = tracks[i].title.toLowerCase().includes(v);
-    c.style.display = ok ? "block" : "none";
+  cards.forEach((c,i)=>{
+    c.style.display = tracks[i].title.toLowerCase().includes(v)
+      ? "block"
+      : "none";
   });
 });
