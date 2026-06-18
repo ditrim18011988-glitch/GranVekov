@@ -117,6 +117,29 @@ button {
   position: relative;
   z-index: 2;
 }
+.downloadBtn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  height: 40px;
+  margin-top: 8px;
+  background: #222236;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.downloadBtn .fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff3c3c, #ff7a7a);
+  transition: width 0.2s linear;
+
+}
 
 /* =========================
    PLAYER (MAIN + MINI MODE)
