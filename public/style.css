@@ -138,6 +138,7 @@ button {
   cursor: url("music/rock-cursor.png"), pointer !important;
 }
 
+/* 🔥 ВАЖНЫЙ ФИКС БАГА */
 .downloadBtn .fill {
   position: absolute;
   left: 0;
@@ -146,6 +147,8 @@ button {
   width: 0%;
   background: linear-gradient(90deg, #ff3c3c, #ff7a7a);
   transition: width 0.2s linear;
+
+  pointer-events: none; /* 👈 ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ */
 }
 
 /* PLAYER */
