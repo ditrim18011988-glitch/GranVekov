@@ -234,3 +234,26 @@ button {
   .downloadBtn .fill {
   pointer-events: none;
 }
+  /* FIX CURSOR ON DOWNLOAD BUTTON (ЖЁСТКОЕ ПЕРЕКРЫТИЕ) */
+.downloadBtn {
+  cursor: url("music/rock-cursor.png"), pointer !important;
+}
+
+.downloadBtn:hover {
+  cursor: url("music/rock-cursor.png"), pointer !important;
+}
+
+/* ВАЖНО: чтобы внутренние слои НЕ ломали hover */
+.downloadBtn .fill {
+  pointer-events: none;
+}
+
+.downloadBtn span {
+  pointer-events: none;
+  cursor: url("music/rock-cursor.png"), pointer !important;
+}
+
+/* страховка на ВСЕ внутренние элементы */
+.downloadBtn * {
+  pointer-events: none;
+}
