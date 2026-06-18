@@ -222,13 +222,35 @@ const tracks = [
 let current = -1;
 let cards = [];
 
+/* ================= STATS ================= */
+const stats = JSON.parse(localStorage.getItem("stats") || "{}");
+
+function initStats(i){
+  if(!stats[i]){
+    stats[i] = { plays: 0, downloads: 0 };
+  }
+}
+
+function saveStats(){
+  localStorage.setItem("stats", JSON.stringify(stats));
+}
+
+function renderStats(i){
+  const p = document.getElementById("p"+i);
+  const d = document.getElementById("d"+i);
+
+  if(p) p.textContent = stats[i]?.plays || 0;
+  if(d) d.textContent = stats[i]?.downloads || 0;
+}
+
+/* ================= ELEMENTS ================= */
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
-const searchInput = document.getElementById("search"); // ✅ FIX
+const searchInput = document.getElementById("search");
 
 /* ================= SAFE PLAY ================= */
 function safePlay(){
@@ -240,32 +262,36 @@ function safePlay(){
 function load(i){
   current = i;
 
+  initStats(i);
+
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
+
+  /* 👁 +1 просмотр */
+  stats[i].plays++;
+  saveStats();
+
+  renderStats(i);
 
   safePlay();
   syncUI();
 }
 
-/* ================= TOGGLE TRACK ================= */
+/* ================= TRACK CLICK ================= */
 function toggleTrack(i){
-
   if(i !== current){
     load(i);
     return;
   }
 
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
+  if(audio.paused) safePlay();
+  else audio.pause();
 
   syncUI();
 }
 
-/* ================= PLAYER BUTTON ================= */
+/* ================= MAIN BUTTON ================= */
 function toggle(){
   if(current === -1){
     load(0);
@@ -291,7 +317,6 @@ function prev(){
 
 /* ================= UI ================= */
 function syncUI(){
-
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
@@ -328,9 +353,17 @@ tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
 
+  initStats(i);
+
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
+
+    <div class="stats">
+      👁 <span id="p${i}">${stats[i]?.plays || 0}</span>
+      &nbsp;&nbsp;
+      ⬇ <span id="d${i}">${stats[i]?.downloads || 0}</span>
+    </div>
 
     <button onclick="toggleTrack(${i})">▶ Play</button>
 
@@ -349,6 +382,8 @@ function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
   const fill = card.querySelector(".fill");
+
+  initStats(i);
 
   const xhr = new XMLHttpRequest();
   xhr.open("GET", t.file, true);
@@ -369,16 +404,26 @@ function downloadTrack(i){
     const safeName = t.title.replace(/[\/\\:*?"<>|]/g, "").trim();
     a.download = safeName + ".mp3";
 
+    /* ⬇ +1 скачивание */
+    stats[i].downloads++;
+    saveStats();
+    renderStats(i);
+
     a.click();
 
     URL.revokeObjectURL(url);
     fill.style.width = "0%";
   };
 
+  xhr.onerror = () => {
+    alert("Ошибка скачивания");
+    fill.style.width = "0%";
+  };
+
   xhr.send();
 }
 
-/* ================= SEARCH (FIXED) ================= */
+/* ================= SEARCH ================= */
 searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase().trim();
 
@@ -388,7 +433,7 @@ searchInput.addEventListener("input", () => {
   });
 });
 
-/* ================= BUTTONS ================= */
+/* ================= UI BUTTONS ================= */
 document.getElementById("togglePlayer").onclick = () => {
   document.getElementById("player").classList.toggle("collapsed");
 };
@@ -400,5 +445,3 @@ function donate(){
 function ads(){
   alert("Реклама");
 }
-
-</script>
