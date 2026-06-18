@@ -17,7 +17,6 @@ body{
   padding-bottom: calc(140px + env(safe-area-inset-bottom));
 }
 
-/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -39,21 +38,19 @@ body{
 
 .side{ width:60px; display:flex; justify-content:center; }
 
-/* LOGO */
 .logo{
   display:flex;
   justify-content:center;
   margin:30px 0;
+  padding:0 10px;
 }
 
 .logo img{
   max-width:90vw;
   max-height:420px;
   border-radius:16px;
-  display:block;
 }
 
-/* GRID */
 .container{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
@@ -62,7 +59,6 @@ body{
   padding-bottom:220px;
 }
 
-/* CARD */
 .card{
   background:#1a1a25;
   border-radius:16px;
@@ -77,8 +73,8 @@ body{
   box-shadow:0 0 25px rgba(255,60,60,0.4);
 }
 
-@keyframes fadeIn {
-  to { opacity:1; transform:translateY(0); }
+@keyframes fadeIn{
+  to{ opacity:1; transform:translateY(0); }
 }
 
 .card img{
@@ -86,7 +82,6 @@ body{
   border-radius:12px;
 }
 
-/* BUTTON */
 button{
   width:100%;
   margin-top:8px;
@@ -101,10 +96,10 @@ button{
 /* DOWNLOAD */
 .downloadBtn{
   position:relative;
-  overflow:hidden;
-  border-radius:10px;
   height:40px;
   margin-top:8px;
+  border-radius:10px;
+  overflow:hidden;
   background:#222236;
   cursor:pointer;
   display:flex;
@@ -119,7 +114,6 @@ button{
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
-  transition:width 0.2s linear;
 }
 
 .downloadBtn span{
@@ -143,17 +137,6 @@ button{
   height:92px;
   box-sizing:border-box;
   z-index:999;
-  transition:0.25s ease;
-}
-
-#player.collapsed{
-  height:52px;
-}
-
-#player.collapsed #cover,
-#player.collapsed .controls,
-#player.collapsed #progress{
-  display:none;
 }
 
 #cover{
@@ -179,13 +162,14 @@ button{
   color:white;
   border-radius:8px;
   padding:6px 10px;
-  cursor:pointer;
 }
 
+/* MOBILE */
 @media (max-width:768px){
   .container{
     grid-template-columns:repeat(2,1fr);
   }
+
   #search{ width:100%; }
 }
 </style>
@@ -207,6 +191,7 @@ button{
 
 <div id="player">
   <img id="cover">
+
   <div style="flex:1">
     <div id="title">Выбери трек</div>
 
@@ -222,7 +207,6 @@ button{
   <button id="togglePlayer">▾</button>
   <audio id="audio"></audio>
 </div>
-
 <script>
 
 const tracks = [
@@ -252,9 +236,10 @@ const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 
+/* SAFE PLAY */
 function safePlay(){
   const p = audio.play();
-  if(p && p.catch) p.catch(()=>{});
+  if(p) p.catch(()=>{});
 }
 
 /* LOAD */
@@ -263,12 +248,30 @@ function load(i){
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
-
   safePlay();
   syncUI();
 }
 
-/* TOGGLE */
+/* CLICK CARD BUTTON (ВАЖНО ИСПРАВЛЕНО) */
+function toggleTrack(i){
+
+  // если другой трек — просто загружаем
+  if(i !== current){
+    load(i);
+    return;
+  }
+
+  // если тот же трек — НЕ перезагружаем
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
+
+  syncUI();
+}
+
+/* PLAYER BUTTON */
 function toggle(){
   if(audio.paused) safePlay();
   else audio.pause();
@@ -284,11 +287,14 @@ function syncUI(){
 
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
-    btn.textContent = (i === current && !audio.paused)
-      ? "⏸ Pause"
-      : "▶ Play";
 
-    c.classList.toggle("active", i === current);
+    if(i === current && !audio.paused){
+      btn.textContent = "⏸ Pause";
+      c.classList.add("active");
+    } else {
+      btn.textContent = "▶ Play";
+      c.classList.remove("active");
+    }
   });
 }
 
@@ -316,7 +322,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
-    <button onclick="load(${i})">▶ Play</button>
+    <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -328,7 +334,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* DOWNLOAD */
+/* DOWNLOAD FIX (НОРМ ИМЯ ФАЙЛА) */
 function downloadTrack(i){
   const t = tracks[i];
 
@@ -351,7 +357,7 @@ function downloadTrack(i){
     });
 }
 
-/* PLAYER BUTTON */
+/* BUTTONS */
 document.getElementById("togglePlayer").onclick = () => {
   document.getElementById("player").classList.toggle("collapsed");
 };
