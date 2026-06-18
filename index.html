@@ -209,6 +209,8 @@ button{
 </div>
 <script>
 
+<script>
+
 const tracks = [
   {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
   {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
@@ -236,32 +238,49 @@ const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 
-/* SAFE PLAY */
+/* ================= SAFE PLAY ================= */
 function safePlay(){
   const p = audio.play();
   if(p) p.catch(()=>{});
 }
 
-/* LOAD */
+/* ================= LOAD TRACK ================= */
 function load(i){
   current = i;
+
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
+
   safePlay();
   syncUI();
 }
 
-/* CLICK CARD BUTTON (ВАЖНО ИСПРАВЛЕНО) */
+/* ================= PLAY / PAUSE ================= */
+function toggle(){
+
+  // если трек ещё не выбран
+  if(current === -1){
+    load(0);
+    return;
+  }
+
+  if(audio.paused) safePlay();
+  else audio.pause();
+
+  syncUI();
+}
+
+/* ================= CARD CLICK ================= */
 function toggleTrack(i){
 
-  // если другой трек — просто загружаем
+  // новый трек
   if(i !== current){
     load(i);
     return;
   }
 
-  // если тот же трек — НЕ перезагружаем
+  // тот же трек — НЕ перезагружаем
   if(audio.paused){
     safePlay();
   } else {
@@ -271,18 +290,20 @@ function toggleTrack(i){
   syncUI();
 }
 
-/* PLAYER BUTTON */
-function toggle(){
-  if(audio.paused) safePlay();
-  else audio.pause();
+/* ================= NEXT / PREV ================= */
+function next(){
+  if(current === -1) return load(0);
+  load((current + 1) % tracks.length);
 }
 
-/* NEXT / PREV */
-function next(){ load((current+1)%tracks.length); }
-function prev(){ load((current-1+tracks.length)%tracks.length); }
+function prev(){
+  if(current === -1) return load(0);
+  load((current - 1 + tracks.length) % tracks.length);
+}
 
-/* UI */
+/* ================= UI ================= */
 function syncUI(){
+
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
@@ -298,23 +319,23 @@ function syncUI(){
   });
 }
 
-/* EVENTS */
+/* ================= EVENTS ================= */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 audio.addEventListener("ended", next);
 
-/* PROGRESS */
+/* ================= PROGRESS ================= */
 audio.ontimeupdate = () => {
   if(audio.duration){
-    progress.value = (audio.currentTime/audio.duration)*100;
+    progress.value = (audio.currentTime / audio.duration) * 100;
   }
 };
 
 progress.oninput = () => {
-  audio.currentTime = (progress.value/100)*audio.duration;
+  audio.currentTime = (progress.value / 100) * audio.duration;
 };
 
-/* CARDS */
+/* ================= BUILD CARDS ================= */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -322,6 +343,7 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
+
     <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
@@ -334,7 +356,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* DOWNLOAD FIX (НОРМ ИМЯ ФАЙЛА) */
+/* ================= DOWNLOAD (FIXED + PROGRESS) ================= */
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
@@ -358,7 +380,10 @@ function downloadTrack(i){
       const a = document.createElement("a");
       a.href = url;
 
-      const safeName = t.title.replace(/[\/\\:*?"<>|]/g, "").trim();
+      const safeName = t.title
+        .replace(/[\/\\:*?"<>|]/g, "")
+        .trim();
+
       a.download = safeName + ".mp3";
 
       document.body.appendChild(a);
@@ -378,29 +403,19 @@ function downloadTrack(i){
 
   xhr.send();
 }
-      const url = URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
-      a.href = url;
-
-      const safeName = t.title.replace(/[\/\\:*?"<>|]/g,"").trim();
-      a.download = safeName + ".mp3";
-
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
-      URL.revokeObjectURL(url);
-    });
-}
-
-/* BUTTONS */
+/* ================= EXTRA BUTTONS ================= */
 document.getElementById("togglePlayer").onclick = () => {
   document.getElementById("player").classList.toggle("collapsed");
 };
 
-function donate(){ window.open("https://paypal.me/yourlink"); }
-function ads(){ alert("Реклама"); }
+function donate(){
+  window.open("https://paypal.me/yourlink");
+}
+
+function ads(){
+  alert("Реклама");
+}
 
 </script>
 
