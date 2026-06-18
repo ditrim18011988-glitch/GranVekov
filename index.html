@@ -2,45 +2,51 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Грань Веков</title>
+
+<link rel="icon" href="music/favicon.png">
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family: Arial;
   background:#0b0b10;
   color:white;
-  padding-bottom:140px;
+  cursor: url("music/rock-cursor.png"), auto;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom));
 }
 
-/* TOP */
 .topbar{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   padding:10px 20px;
   background:#111;
 }
 
 #search{
-  padding:8px;
-  width:200px;
-  border-radius:8px;
+  padding:8px 12px;
+  border-radius:10px;
   border:none;
+  outline:none;
   background:#1a1a25;
   color:white;
+  width:200px;
 }
 
-.side button{
-  background:#222;
-  border:none;
-  color:white;
-  padding:8px 10px;
-  border-radius:8px;
-  cursor:pointer;
+.logo{
+  display:flex;
+  justify-content:center;
+  margin:30px 0;
 }
 
-/* GRID */
+.logo img{
+  max-width:90vw;
+  max-height:420px;
+  border-radius:16px;
+}
+
 .container{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -50,30 +56,27 @@ body{
 
 .card{
   background:#1a1a25;
+  border-radius:16px;
   padding:12px;
-  border-radius:14px;
-}
-
-.card img{
-  width:100%;
-  border-radius:10px;
+  opacity:0;
+  transform:translateY(12px);
+  animation:fadeIn .5s ease forwards;
 }
 
 .card.active{
   border:1px solid #ff3c3c;
+  box-shadow:0 0 25px rgba(255,60,60,0.4);
 }
 
-/* STATS */
-.stats{
-  margin-top:6px;
-  font-size:13px;
-  opacity:0.8;
-  display:flex;
-  justify-content:center;
-  gap:12px;
+@keyframes fadeIn{
+  to{opacity:1;transform:translateY(0);}
 }
 
-/* BUTTONS */
+.card img{
+  width:100%;
+  border-radius:12px;
+}
+
 button{
   width:100%;
   margin-top:8px;
@@ -87,12 +90,12 @@ button{
 
 /* DOWNLOAD */
 .downloadBtn{
-  margin-top:8px;
-  height:38px;
-  background:#222236;
-  border-radius:10px;
   position:relative;
+  height:40px;
+  margin-top:8px;
+  border-radius:10px;
   overflow:hidden;
+  background:#222236;
   cursor:pointer;
   display:flex;
   align-items:center;
@@ -108,53 +111,72 @@ button{
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
 }
 
-.downloadBtn span{
-  position:relative;
-  z-index:2;
+.stats{
+  margin-top:6px;
+  font-size:13px;
+  opacity:0.8;
+  display:flex;
+  justify-content:center;
+  gap:10px;
 }
 
 /* PLAYER */
 #player{
   position:fixed;
-  bottom:0;
   left:0;
   right:0;
-  background:#0f0f18;
+  bottom:0;
   display:flex;
-  gap:10px;
-  padding:10px;
   align-items:center;
+  gap:12px;
+  padding:10px 14px;
+  background:rgba(10,10,18,0.95);
+  backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.06);
+  height:92px;
+  box-sizing:border-box;
+  z-index:999;
 }
 
 #cover{
-  width:50px;
-  height:50px;
-  border-radius:8px;
+  width:58px;
+  height:58px;
+  border-radius:10px;
 }
 
-.controls button{
-  width:auto;
-  padding:6px 10px;
+.controls{
+  display:flex;
+  gap:10px;
 }
 
 #progress{
   width:100%;
+  height:4px;
+}
+
+#togglePlayer{
+  margin-left:auto;
+  background:#222236;
+  border:none;
+  color:white;
+  border-radius:8px;
+  padding:6px 10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="side"><button onclick="ads()">📢</button></div>
-  <input id="search" placeholder="Поиск...">
-  <div class="side"><button onclick="donate()">💰</button></div>
+  <input id="search" placeholder="Поиск музыки...">
+</div>
+
+<div class="logo">
+  <img src="music/logo.png">
 </div>
 
 <div class="container" id="list"></div>
 
-<!-- PLAYER -->
 <div id="player">
   <img id="cover">
   <div style="flex:1">
@@ -162,41 +184,38 @@ button{
 
     <div class="controls">
       <button onclick="prev()">⏮</button>
-      <button onclick="toggle()" id="playBtn">▶</button>
+      <button onclick="toggle()" id="playBtn">▶️</button>
       <button onclick="next()">⏭</button>
     </div>
 
     <input id="progress" type="range" value="0">
   </div>
 
+  <button id="togglePlayer">▾</button>
   <audio id="audio"></audio>
 </div>
 
 <script>
-
-/* ================= TRACKS ================= */
 const tracks = [
   {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
   {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
   {title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg"},
   {title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg"},
   {title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg"},
-  {title:"Белоснежка и семь грехов", file:"music/track6.mp3", cover:"music/cover6.jpg"},
+  {title:"Белоснежка", file:"music/track6.mp3", cover:"music/cover6.jpg"},
   {title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg"},
-  {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"}
+  {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"},
+  {title:"Распутин", file:"music/track9.mp3", cover:"music/cover9.jpg"},
+  {title:"Питер Пэн", file:"music/track10.mp3", cover:"music/cover10.jpg"},
+  {title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg"},
+  {title:"Аид", file:"music/track12.mp3", cover:"music/cover12.jpg"},
+  {title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"},
+  {title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg"}
 ];
 
 let current = -1;
 let cards = [];
 
-/* ================= STATS ================= */
-const stats = JSON.parse(localStorage.getItem("stats") || "{}");
-
-function saveStats(){
-  localStorage.setItem("stats", JSON.stringify(stats));
-}
-
-/* ================= ELEMENTS ================= */
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
@@ -205,7 +224,11 @@ const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 
-/* ================= PLAY ================= */
+/* STATS */
+const stats = JSON.parse(localStorage.getItem("stats") || "{}");
+function saveStats(){ localStorage.setItem("stats", JSON.stringify(stats)); }
+
+/* PLAY */
 function safePlay(){
   audio.play().catch(()=>{});
 }
@@ -213,66 +236,73 @@ function safePlay(){
 function load(i){
   current = i;
 
-  if(!stats[i]) stats[i] = {play:0, download:0};
+  stats[i] = stats[i] || {plays:0, downloads:0};
+  stats[i].plays++;
+  saveStats();
 
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
 
-  stats[i].play++;
-  saveStats();
-
-  syncUI();
   safePlay();
+  syncUI();
 }
 
-/* ================= CONTROLS ================= */
+/* TOGGLE */
+function toggleTrack(i){
+  if(i !== current) return load(i);
+  audio.paused ? safePlay() : audio.pause();
+  syncUI();
+}
+
 function toggle(){
   if(current === -1) return load(0);
   audio.paused ? safePlay() : audio.pause();
+  syncUI();
 }
 
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* ================= UI ================= */
+/* UI */
 function syncUI(){
-  playBtn.textContent = audio.paused ? "▶" : "⏸";
+  playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
+    const btn = c.querySelector("button");
+    btn.textContent = (i===current && !audio.paused) ? "⏸ Pause" : "▶ Play";
     c.classList.toggle("active", i===current && !audio.paused);
   });
 }
 
-/* ================= EVENTS ================= */
-audio.addEventListener("ended", next);
-audio.addEventListener("play", syncUI);
-audio.addEventListener("pause", syncUI);
-
-audio.ontimeupdate = ()=>{
-  if(audio.duration)
+/* EVENTS */
+audio.addEventListener("timeupdate",()=>{
+  if(audio.duration){
     progress.value = (audio.currentTime/audio.duration)*100;
+  }
+});
+
+progress.oninput=()=>{
+  audio.currentTime=(progress.value/100)*audio.duration;
 };
 
-progress.oninput = ()=>{
-  audio.currentTime = (progress.value/100)*audio.duration;
-};
+audio.addEventListener("ended", next);
 
-/* ================= CARDS ================= */
+/* CARDS */
 tracks.forEach((t,i)=>{
-  const div = document.createElement("div");
-  div.className = "card";
+  const div=document.createElement("div");
+  div.className="card";
 
-  div.innerHTML = `
+  div.innerHTML=`
     <img src="${t.cover}">
     <h3>${t.title}</h3>
 
     <div class="stats">
-      👁 ${stats[i]?.play || 0}
-      ⬇ ${stats[i]?.download || 0}
+      👁 ${stats[i]?.plays || 0}
+      ⬇ ${stats[i]?.downloads || 0}
     </div>
 
-    <button onclick="load(${i})">▶ Play</button>
+    <button onclick="toggleTrack(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -284,64 +314,60 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
-/* ================= DOWNLOAD ================= */
+/* DOWNLOAD */
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
   const fill = card.querySelector(".fill");
 
   const xhr = new XMLHttpRequest();
-  xhr.open("GET", t.file, true);
+  xhr.open("GET", t.file);
   xhr.responseType = "blob";
 
-  xhr.onprogress = e=>{
+  xhr.onprogress=e=>{
     if(e.lengthComputable){
-      fill.style.width = (e.loaded/e.total)*100+"%";
+      fill.style.width=(e.loaded/e.total)*100+"%";
     }
   };
 
-  xhr.onload = ()=>{
-    const url = URL.createObjectURL(xhr.response);
+  xhr.onload=()=>{
+    const url=URL.createObjectURL(xhr.response);
 
-    const a = document.createElement("a");
-    a.href = url;
+    const a=document.createElement("a");
+    a.href=url;
 
-    const safeName = t.title.replace(/[\/\\:*?"<>|]/g,"");
-    a.download = safeName+".mp3";
+    const name=t.title.replace(/[\/\\:*?"<>|]/g,"").trim();
 
-    stats[i].download++;
+    a.download=name+".mp3";
+
+    stats[i] = stats[i] || {plays:0, downloads:0};
+    stats[i].downloads++;
     saveStats();
 
     a.click();
     URL.revokeObjectURL(url);
 
-    fill.style.width = "0%";
+    fill.style.width="0%";
   };
 
   xhr.send();
 }
 
-/* ================= SEARCH ================= */
-search.addEventListener("input", ()=>{
-  const v = search.value.toLowerCase();
+/* SEARCH */
+search.addEventListener("input",()=>{
+  const v=search.value.toLowerCase().trim();
 
-  cards.forEach((c,i)=>{
-    c.style.display =
-      tracks[i].title.toLowerCase().includes(v)
-      ? "block"
-      : "none";
+  cards.forEach(c=>{
+    const name=c.querySelector("h3").textContent.toLowerCase();
+    c.style.display=name.includes(v)?"block":"none";
   });
 });
 
-/* ================= BUTTONS ================= */
-function donate(){
-  window.open("https://paypal.me/yourlink");
-}
-
-function ads(){
-  alert("Реклама");
-}
-
+/* PLAYER */
+document.getElementById("togglePlayer").onclick=()=>{
+  document.getElementById("player").classList.toggle("collapsed");
+};
 </script>
+
 </body>
 </html>
