@@ -23,6 +23,7 @@ body{
   align-items:center;
   padding:10px 20px;
   background:#111;
+  gap:10px;
 }
 
 #search{
@@ -58,6 +59,12 @@ body{
   background:#1a1a25;
   border-radius:16px;
   padding:12px;
+  transition:.2s;
+}
+
+.card.active{
+  border:1px solid #ff3c3c;
+  box-shadow:0 0 20px rgba(255,60,60,0.5);
 }
 
 .card img{
@@ -76,6 +83,7 @@ button{
   cursor:pointer;
 }
 
+/* DOWNLOAD */
 .downloadBtn{
   position:relative;
   height:40px;
@@ -97,6 +105,7 @@ button{
   background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
 }
 
+/* STATS */
 .stats{
   margin-top:6px;
   font-size:13px;
@@ -106,6 +115,7 @@ button{
   gap:10px;
 }
 
+/* PLAYER FIX (ВАЖНО) */
 #player{
   position:fixed;
   left:0;
@@ -118,7 +128,15 @@ button{
   background:rgba(10,10,18,0.95);
   backdrop-filter:blur(20px);
   height:92px;
+  box-sizing:border-box;
   z-index:999;
+}
+
+#player > div{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
 }
 
 #cover{
@@ -136,7 +154,9 @@ button{
 <body>
 
 <div class="topbar">
+  <button onclick="ads()">📢 Реклама</button>
   <input id="search" placeholder="Поиск музыки...">
+  <button onclick="donate()">💰 Донат</button>
 </div>
 
 <div class="logo">
@@ -147,12 +167,15 @@ button{
 
 <div id="player">
   <img id="cover">
-  <div style="flex:1">
+
+  <div>
     <div id="title">Выбери трек</div>
 
-    <button onclick="prev()">⏮</button>
-    <button onclick="toggle()" id="playBtn">▶️</button>
-    <button onclick="next()">⏭</button>
+    <div style="display:flex; gap:6px;">
+      <button onclick="prev()">⏮</button>
+      <button onclick="toggle()" id="playBtn">▶️</button>
+      <button onclick="next()">⏭</button>
+    </div>
 
     <input id="progress" type="range" value="0">
   </div>
@@ -165,7 +188,6 @@ button{
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <script>
-/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
@@ -175,16 +197,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* ================= TRACKS ================= */
+/* TRACKS */
 const tracks = [
   {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
   {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
   {title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg"},
   {title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg"},
   {title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg"},
+  {title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg"},
   {title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg"},
+  {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"},
+  {title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg"},
+  {title:"Питер Пэн-похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg"},
+  {title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg"},
   {title:"Аид", file:"music/track12.mp3", cover:"music/cover12.jpg"},
-  {title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"}
+  {title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"},
+  {title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg"}
 ];
 
 let current = -1;
@@ -193,15 +221,15 @@ let cards = [];
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
-const progress = document.getElementById("progress");
+const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
 
-/* ================= SAFE PLAY ================= */
+/* SAFE PLAY */
 function safePlay(){
   audio.play().catch(()=>{});
 }
 
-/* ================= FIREBASE STATS ================= */
+/* FIREBASE */
 function addPlay(i){
   db.collection("stats").doc(String(i)).set({
     plays: firebase.firestore.FieldValue.increment(1)
@@ -214,18 +242,7 @@ function addDownload(i){
   }, {merge:true});
 }
 
-function listenStats(i){
-  db.collection("stats").doc(String(i)).onSnapshot(doc=>{
-    const d = doc.data() || {};
-    const p = document.getElementById("p"+i);
-    const dwn = document.getElementById("d"+i);
-
-    if(p) p.textContent = d.plays || 0;
-    if(dwn) dwn.textContent = d.downloads || 0;
-  });
-}
-
-/* ================= LOAD ================= */
+/* LOAD */
 function load(i){
   current = i;
 
@@ -236,60 +253,46 @@ function load(i){
   cover.src = tracks[i].cover;
 
   safePlay();
-  syncUI();   // 🔥 ВАЖНО
+  syncUI();
 }
 
-/* ================= PLAY / PAUSE FIX ================= */
-function toggleTrack(i){
+/* TOGGLE */
+function toggle(){
+  if(current === -1) return load(0);
 
-  // если другой трек → загрузить
-  if(i !== current){
-    load(i);
-    return;
-  }
-
-  // если тот же → пауза/плей
   if(audio.paused){
     safePlay();
   } else {
     audio.pause();
   }
-
-  syncUI();
-}
-
-/* ================= PLAYER BUTTON ================= */
-function toggle(){
-  if(current === -1){
-    load(0);
-    return;
-  }
-
-  if(audio.paused) safePlay();
-  else audio.pause();
-
   syncUI();
 }
 
 function next(){ load((current+1)%tracks.length); }
 function prev(){ load((current-1+tracks.length)%tracks.length); }
 
-/* ================= UI FIX ================= */
+/* UI FIX (ВАЖНО) */
 function syncUI(){
+  playBtn.textContent = audio.paused ? "▶️" : "⏸";
+
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
 
-    if(i === current && !audio.paused){
-      btn.textContent = "⏸ Pause";
+    if(i === current){
       c.classList.add("active");
+      btn.textContent = audio.paused ? "▶ Play" : "⏸ Pause";
     } else {
-      btn.textContent = "▶ Play";
       c.classList.remove("active");
+      btn.textContent = "▶ Play";
     }
   });
 }
 
-/* ================= CARDS ================= */
+/* EVENTS */
+audio.addEventListener("play", syncUI);
+audio.addEventListener("pause", syncUI);
+
+/* CARDS */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -303,7 +306,7 @@ tracks.forEach((t,i)=>{
       ⬇ <span id="d${i}">0</span>
     </div>
 
-    <button onclick="toggleTrack(${i})">▶ Play</button>
+    <button onclick="load(${i})">▶ Play</button>
 
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
@@ -313,11 +316,9 @@ tracks.forEach((t,i)=>{
 
   list.appendChild(div);
   cards.push(div);
-
-  listenStats(i);
 });
 
-/* ================= DOWNLOAD ================= */
+/* DOWNLOAD */
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
@@ -336,22 +337,22 @@ function downloadTrack(i){
   xhr.onload=()=>{
     const url = URL.createObjectURL(xhr.response);
 
-    const a=document.createElement("a");
-    a.href=url;
-    a.download=t.title+".mp3";
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = t.title + ".mp3";
 
     addDownload(i);
 
     a.click();
     URL.revokeObjectURL(url);
 
-    fill.style.width="0%";
+    fill.style.width = "0%";
   };
 
   xhr.send();
 }
 
-/* ================= SEARCH ================= */
+/* SEARCH */
 document.getElementById("search").addEventListener("input",(e)=>{
   const v = e.target.value.toLowerCase();
 
@@ -360,4 +361,16 @@ document.getElementById("search").addEventListener("input",(e)=>{
     c.style.display = t.includes(v) ? "block" : "none";
   });
 });
+
+/* ADS / DONATE */
+function ads(){
+  alert("Реклама");
+}
+
+function donate(){
+  window.open("https://paypal.me/yourlink");
+}
 </script>
+
+</body>
+</html>
