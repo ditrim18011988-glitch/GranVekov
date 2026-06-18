@@ -91,6 +91,7 @@ button{
   cursor:pointer;
 }
 
+/* DOWNLOAD */
 .downloadBtn{
   position:relative;
   height:40px;
@@ -116,6 +117,16 @@ button{
 .downloadBtn span{
   position:relative;
   z-index:2;
+}
+
+/* ===== ДОБАВЛЕНО: СТАТИСТИКА ===== */
+.stats{
+  margin-top:6px;
+  font-size:14px;
+  opacity:0.8;
+  display:flex;
+  justify-content:center;
+  gap:10px;
 }
 
 /* PLAYER */
@@ -169,36 +180,6 @@ button{
 </head>
 
 <body>
-
-<div class="topbar">
-  <div class="side"><button onclick="ads()">📢</button></div>
-  <input id="search" placeholder="Поиск музыки...">
-  <div class="side"><button onclick="donate()">💰</button></div>
-</div>
-
-<div class="logo">
-  <img src="music/logo.png">
-</div>
-
-<div class="container" id="list"></div>
-
-<div id="player">
-  <img id="cover">
-  <div style="flex:1">
-    <div id="title">Выбери трек</div>
-
-    <div class="controls">
-      <button onclick="prev()">⏮</button>
-      <button onclick="toggle()" id="playBtn">▶️</button>
-      <button onclick="next()">⏭</button>
-    </div>
-
-    <input id="progress" type="range" value="0">
-  </div>
-
-  <button id="togglePlayer">▾</button>
-  <audio id="audio"></audio>
-</div>
 
 <script>
 
