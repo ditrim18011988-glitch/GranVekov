@@ -1,18 +1,18 @@
 const tracks = [
-  { title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg" },
-  { title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg" },
-  { title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg" },
-  { title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg" },
-  { title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg" },
-  { title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg" },
-  { title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg" },
-  { title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg" },
-  { title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg" },
-  { title:"Питер Пэн-похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg" },
-  { title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg" },
-  { title:"Аид", file:"music/track12.mp3", cover:"music/cover12.jpg" },
-  { title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg" },
-  { title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg" }
+  {id:1, title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
+  {id:2, title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
+  {id:3, title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg"},
+  {id:4, title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg"},
+  {id:5, title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg"},
+  {id:6, title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg"},
+  {id:7, title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg"},
+  {id:8, title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"},
+  {id:9, title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg"},
+  {id:10, title:"Питер Пэн - Похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg"},
+  {id:11, title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg"},
+  {id:12, title:"Аид", file:"music/track12.mp3", cover:"music/cover12.jpg"},
+  {id:13, title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"},
+  {id:14, title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg"}
 ];
 
 let current = -1;
