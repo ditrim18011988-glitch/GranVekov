@@ -3,387 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
 <title>Грань Веков</title>
 
 <link rel="icon" href="music/favicon.png">
+<link rel="stylesheet" href="style.css">
 
-<style>
-body{
-  margin:0;
-  font-family: Arial;
-  background:#0b0b10;
-  color:white;
-  cursor: url("music/rock-cursor.png"), auto;
-
-  /* safe-area + плеер */
-  padding-bottom: calc(140px + env(safe-area-inset-bottom));
-}
-
-/* TOPBAR */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 20px;
-  background:#111;
-  gap:10px;
-}
-
-#search{
-  padding:8px 12px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  background:#1a1a25;
-  color:white;
-  width:200px;
-}
-
-.side{ width:60px; display:flex; justify-content:center; }
-
-/* LOGO */
-.logo{
-  display:flex;
-  justify-content:center;
-  margin:30px 0;
-  padding:0 10px;
-}
-
-.logo img{
-  width:auto;
-  height:auto;
-  max-width: 90vw;
-  max-height: 420px;
-  border-radius:16px;
-  display:block;
-}
-
-/* GRID */
-.container{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap:20px;
-  padding:20px;
-  padding-bottom:220px;
-}
-
-/* CARD */
-.card{
-  background:#1a1a25;
-  border-radius:16px;
-  padding:12px;
-  opacity:0;
-  transform:translateY(12px);
-  animation:fadeIn 0.5s ease forwards;
-}
-
-.card.active{
-  border:1px solid #ff3c3c;
-  box-shadow:0 0 25px rgba(255,60,60,0.4);
-}
-
-@keyframes fadeIn {
-  to { opacity:1; transform:translateY(0); }
-}
-
-.card img{
-  width:100%;
-  border-radius:12px;
-}
-
-/* BUTTON */
-button{
-  width:100%;
-  margin-top:8px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#ff3c3c;
-  color:white;
-  cursor:pointer;
-}
-
-/* DOWNLOAD */
-.downloadBtn{
-  position:relative;
-  overflow:hidden;
-  border-radius:10px;
-  height:40px;
-  margin-top:8px;
-  background:#222236;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.downloadBtn .fill{
-  position:absolute;
-  left:0;
-  top:0;
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#ff3c3c,#ff7a7a);
-  transition:width 0.2s linear;
-}
-
-.downloadBtn span{
-  position:relative;
-  z-index:2;
-}
-
-/* ================= PLAYER ================= */
-
-#player{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  padding:10px 14px;
-  background:rgba(10,10,18,0.95);
-  backdrop-filter: blur(20px);
-
-  border-top:1px solid rgba(255,255,255,0.06);
-
-  height:92px;
-  box-sizing:border-box;
-  z-index:999;
-
-  transition:0.25s ease;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom));
-}
-
-/* COLLAPSED */
-#player.collapsed{
-  height:52px;
-  overflow:hidden;
-}
-
-#player.collapsed #cover,
-#player.collapsed .controls,
-#player.collapsed #progress{
-  display:none;
-}
-
-#player.collapsed #title{
-  font-size:14px;
-}
-
-/* COVER */
-#cover{
-  width:58px;
-  height:58px;
-  border-radius:10px;
-}
-
-/* CONTROLS */
-.controls{
-  display:flex;
-  gap:10px;
-}
-
-/* PROGRESS */
-#progress{
-  width:100%;
-  height:4px;
-}
-
-/* TOGGLE BUTTON */
-#togglePlayer{
-  margin-left:auto;
-  background:#222236;
-  border:none;
-  color:white;
-  border-radius:8px;
-  padding:6px 10px;
-  cursor:pointer;
-}
-
-/* MOBILE */
-@media (max-width:768px){
-
-  .container{
-    grid-template-columns:repeat(2,1fr);
-    padding-bottom:260px;
-  }
-
-  #search{
-    width:100%;
-  }
-}
-</style>
 </head>
-
 <body>
 
 <div class="topbar">
-  <div class="side"><button onclick="ads()">📢</button></div>
-  <input id="search" placeholder="Поиск музыки...">
-  <div class="side"><button onclick="donate()">💰</button></div>
+
+    <div class="side">
+        <button onclick="ads()">📢</button>
+    </div>
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Поиск музыки..."
+    >
+
+    <div class="side">
+        <button onclick="donate()">💰</button>
+    </div>
+
 </div>
 
+
 <div class="logo">
-  <img src="music/logo.png">
+    <img src="music/logo.png" alt="">
 </div>
+
 
 <div class="container" id="list"></div>
 
+
 <div id="player">
-  <img id="cover">
 
-  <div style="flex:1">
-    <div id="title">Выбери трек</div>
+    <img id="cover" src="music/cover1.jpg">
 
-    <div class="controls">
-      <button onclick="prev()">⏮</button>
-      <button onclick="toggle()" id="playBtn">▶️</button>
-      <button onclick="next()">⏭</button>
+    <div class="playerCenter">
+
+        <div id="title">
+            Выбери трек
+        </div>
+
+        <div class="controls">
+
+            <button onclick="prev()">
+                ⏮
+            </button>
+
+            <button id="playBtn" onclick="toggle()">
+                ▶️
+            </button>
+
+            <button onclick="next()">
+                ⏭
+            </button>
+
+        </div>
+
+        <input
+            id="progress"
+            type="range"
+            value="0"
+        >
+
     </div>
 
-    <input id="progress" type="range" value="0">
-  </div>
+    <button id="togglePlayer">
+        ▾
+    </button>
 
-  <button id="togglePlayer">▾</button>
-  <audio id="audio"></audio>
+    <audio id="audio"></audio>
+
 </div>
 
-<script>
 
-const tracks = [
-  {title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"},
-  {title:"Всадники Ада", file:"music/track2.mp3", cover:"music/cover2.jpg"},
-  {title:"Чёрное рождество", file:"music/track3.mp3", cover:"music/cover3.jpg"},
-  {title:"Кролик Роджер", file:"music/track4.mp3", cover:"music/cover4.jpg"},
-  {title:"Падший Ангел", file:"music/track5.mp3", cover:"music/cover5.jpg"},
-  {title:"Белоснежка и семь грехов: Союз тьмы", file:"music/track6.mp3", cover:"music/cover6.jpg"},
-  {title:"Сын Дьявола", file:"music/track7.mp3", cover:"music/cover7.jpg"},
-  {title:"До последнего шага", file:"music/track8.mp3", cover:"music/cover8.jpg"},
-  {title:"Распутин-Демон порока", file:"music/track9.mp3", cover:"music/cover9.jpg"},
-  {title:"Питер Пэн-похититель детей", file:"music/track10.mp3", cover:"music/cover10.jpg"},
-  {title:"Пиковая Дама", file:"music/track11.mp3", cover:"music/cover11.jpg"},
-  {title:"Безмолвный город", file:"music/track12.mp3", cover:"music/cover13.jpg"},
-  {title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg"}
-];
-
-let current = -1;
-let cards = [];
-
-const audio = document.getElementById("audio");
-const title = document.getElementById("title");
-const cover = document.getElementById("cover");
-const progress = document.getElementById("progress");
-const playBtn = document.getElementById("playBtn");
-const list = document.getElementById("list");
-
-function safePlay(){
-  const p = audio.play();
-  if(p && p.catch) p.catch(()=>{});
-}
-
-/* LOAD */
-function load(i){
-  current = i;
-  audio.src = tracks[i].file;
-  title.textContent = tracks[i].title;
-  cover.src = tracks[i].cover;
-
-  safePlay();
-  syncUI();
-}
-
-/* TOGGLE */
-function toggle(){
-  if(audio.paused) safePlay();
-  else audio.pause();
-}
-
-/* NEXT / PREV */
-function next(){ load((current+1)%tracks.length); }
-function prev(){ load((current-1+tracks.length)%tracks.length); }
-
-/* UI */
-function syncUI(){
-  playBtn.textContent = audio.paused ? "▶️" : "⏸";
-
-  cards.forEach((c,i)=>{
-    const btn = c.querySelector("button");
-    btn.textContent = (i === current && !audio.paused)
-      ? "⏸ Pause"
-      : "▶ Play";
-
-    c.classList.toggle("active", i === current);
-  });
-}
-
-/* EVENTS */
-audio.addEventListener("play", syncUI);
-audio.addEventListener("pause", syncUI);
-audio.addEventListener("ended", next);
-
-/* PROGRESS */
-audio.ontimeupdate = () => {
-  if(audio.duration){
-    progress.value = (audio.currentTime/audio.duration)*100;
-  }
-};
-
-progress.oninput = () => {
-  audio.currentTime = (progress.value/100)*audio.duration;
-};
-
-/* CARDS */
-tracks.forEach((t,i)=>{
-  const div = document.createElement("div");
-  div.className = "card";
-
-  div.innerHTML = `
-    <img src="${t.cover}">
-    <h3>${t.title}</h3>
-    <button onclick="load(${i})">▶ Play</button>
-  `;
-
-  list.appendChild(div);
-  cards.push(div);
-});
-
-/* COLLAPSE */
-const player = document.getElementById("player");
-const toggleBtn = document.getElementById("togglePlayer");
-
-let collapsed = false;
-
-toggleBtn.onclick = () => {
-  collapsed = !collapsed;
-  player.classList.toggle("collapsed", collapsed);
-  toggleBtn.textContent = collapsed ? "▴" : "▾";
-};
-
-/* SWIPE DOWN */
-let startY = 0;
-
-player.addEventListener("touchstart", e=>{
-  startY = e.touches[0].clientY;
-});
-
-player.addEventListener("touchend", e=>{
-  let endY = e.changedTouches[0].clientY;
-
-  if(endY - startY > 50){
-    collapsed = true;
-    player.classList.add("collapsed");
-    toggleBtn.textContent = "▴";
-  }
-});
-
-function donate(){ window.open("https://paypal.me/yourlink"); }
-function ads(){ alert("Реклама"); }
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
