@@ -101,17 +101,16 @@ button {
   align-items: center;
   justify-content: center;
 
-  /* 🔥 ВАЖНО: единый курсор */
   cursor: url("music/rock-cursor.png"), pointer;
 }
 
-/* 🔥 ГЛАВНЫЙ ФИКС КУРСОРА */
+/* ГЛАВНЫЙ ФИКС КУРСОРА */
 .downloadBtn,
 .downloadBtn * {
   cursor: url("music/rock-cursor.png"), pointer !important;
 }
 
-/* 🔥 ВАЖНО: чтобы заливка НЕ ЛОВИЛА КЛИКИ И HOVER */
+/* ЗАЛИВКА */
 .downloadBtn .fill {
   position: absolute;
   left: 0;
@@ -124,10 +123,15 @@ button {
   pointer-events: none;
 }
 
-/* TEXT поверх */
+/* TEXT */
 .downloadBtn span {
   position: relative;
   z-index: 2;
+}
+
+/* 🔥 ДОБАВЛЕНО ДЛЯ ДИАГНОСТИКИ */
+.downloadBtn:hover {
+  outline: 2px solid red;
 }
 
 /* PLAYER */
