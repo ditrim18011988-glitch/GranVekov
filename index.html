@@ -228,62 +228,102 @@ const cover = document.getElementById("cover");
 const progress = document.getElementById("progress");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
+const searchInput = document.getElementById("search"); // ✅ FIX
 
+/* ================= SAFE PLAY ================= */
 function safePlay(){
   const p = audio.play();
   if(p) p.catch(()=>{});
 }
 
+/* ================= LOAD ================= */
 function load(i){
   current = i;
+
   audio.src = tracks[i].file;
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
+
   safePlay();
   syncUI();
 }
 
+/* ================= TOGGLE TRACK ================= */
 function toggleTrack(i){
+
   if(i !== current){
     load(i);
     return;
   }
-  audio.paused ? safePlay() : audio.pause();
+
+  if(audio.paused){
+    safePlay();
+  } else {
+    audio.pause();
+  }
+
   syncUI();
 }
 
+/* ================= PLAYER BUTTON ================= */
 function toggle(){
-  if(current === -1) load(0);
-  else audio.paused ? safePlay() : audio.pause();
+  if(current === -1){
+    load(0);
+    return;
+  }
+
+  if(audio.paused) safePlay();
+  else audio.pause();
+
+  syncUI();
 }
 
-function next(){ load((current+1)%tracks.length); }
-function prev(){ load((current-1+tracks.length)%tracks.length); }
+/* ================= NEXT / PREV ================= */
+function next(){
+  if(current === -1) return load(0);
+  load((current + 1) % tracks.length);
+}
 
+function prev(){
+  if(current === -1) return load(0);
+  load((current - 1 + tracks.length) % tracks.length);
+}
+
+/* ================= UI ================= */
 function syncUI(){
+
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
   cards.forEach((c,i)=>{
     const btn = c.querySelector("button");
-    btn.textContent = (i===current && !audio.paused) ? "⏸ Pause" : "▶ Play";
-    c.classList.toggle("active", i===current && !audio.paused);
+
+    if(i === current && !audio.paused){
+      btn.textContent = "⏸ Pause";
+      c.classList.add("active");
+    } else {
+      btn.textContent = "▶ Play";
+      c.classList.remove("active");
+    }
   });
 }
 
+/* ================= EVENTS ================= */
 audio.addEventListener("play", syncUI);
 audio.addEventListener("pause", syncUI);
 audio.addEventListener("ended", next);
 
-audio.ontimeupdate = ()=>{
+/* ================= PROGRESS ================= */
+audio.ontimeupdate = () => {
   if(audio.duration){
-    progress.value = (audio.currentTime/audio.duration)*100;
+    progress.value = (audio.currentTime / audio.duration) * 100;
   }
 };
 
-progress.oninput = ()=>{
-  audio.currentTime = (progress.value/100)*audio.duration;
+progress.oninput = () => {
+  audio.currentTime = (progress.value / 100) * audio.duration;
 };
 
+/* ================= BUILD CARDS ================= */
 tracks.forEach((t,i)=>{
   const div = document.createElement("div");
   div.className = "card";
@@ -291,7 +331,9 @@ tracks.forEach((t,i)=>{
   div.innerHTML = `
     <img src="${t.cover}">
     <h3>${t.title}</h3>
+
     <button onclick="toggleTrack(${i})">▶ Play</button>
+
     <div class="downloadBtn" onclick="downloadTrack(${i})">
       <div class="fill"></div>
       <span>⬇ Скачать</span>
@@ -302,6 +344,7 @@ tracks.forEach((t,i)=>{
   cards.push(div);
 });
 
+/* ================= DOWNLOAD ================= */
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
@@ -311,19 +354,19 @@ function downloadTrack(i){
   xhr.open("GET", t.file, true);
   xhr.responseType = "blob";
 
-  xhr.onprogress = (e)=>{
+  xhr.onprogress = (e) => {
     if(e.lengthComputable){
-      fill.style.width = (e.loaded/e.total)*100 + "%";
+      fill.style.width = (e.loaded / e.total) * 100 + "%";
     }
   };
 
-  xhr.onload = ()=>{
+  xhr.onload = () => {
     const url = URL.createObjectURL(xhr.response);
 
     const a = document.createElement("a");
     a.href = url;
 
-    const safeName = t.title.replace(/[\/\\:*?"<>|]/g,"").trim();
+    const safeName = t.title.replace(/[\/\\:*?"<>|]/g, "").trim();
     a.download = safeName + ".mp3";
 
     a.click();
@@ -335,14 +378,27 @@ function downloadTrack(i){
   xhr.send();
 }
 
-document.getElementById("togglePlayer").onclick = ()=>{
+/* ================= SEARCH (FIXED) ================= */
+searchInput.addEventListener("input", () => {
+  const value = searchInput.value.toLowerCase().trim();
+
+  cards.forEach(card => {
+    const titleText = card.querySelector("h3").textContent.toLowerCase();
+    card.style.display = titleText.includes(value) ? "block" : "none";
+  });
+});
+
+/* ================= BUTTONS ================= */
+document.getElementById("togglePlayer").onclick = () => {
   document.getElementById("player").classList.toggle("collapsed");
 };
 
-function donate(){ window.open("https://paypal.me/yourlink"); }
-function ads(){ alert("Реклама"); }
+function donate(){
+  window.open("https://paypal.me/yourlink");
+}
+
+function ads(){
+  alert("Реклама");
+}
 
 </script>
-
-</body>
-</html>
