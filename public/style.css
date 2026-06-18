@@ -88,7 +88,10 @@ button {
   cursor: url("music/rock-cursor.png"), pointer;
 }
 
-/* DOWNLOAD BUTTON */
+/* =========================
+   DOWNLOAD FIX (ПОЛНЫЙ)
+========================= */
+
 .downloadBtn {
   position: relative;
   overflow: hidden;
@@ -102,16 +105,16 @@ button {
   justify-content: center;
 
   cursor: url("music/rock-cursor.png"), pointer;
-  z-index: 10;
+  z-index: 1;
 }
 
-/* КУРСОР ВЕЗДЕ ВНУТРИ */
+/* ВСЁ ВНУТРИ — один курсор */
 .downloadBtn,
 .downloadBtn * {
   cursor: url("music/rock-cursor.png"), pointer !important;
 }
 
-/* ЗАЛИВКА (ВАЖНО: НЕ ЛОВИТ МЫШЬ) */
+/* ЗАЛИВКА (НЕ ПЕРЕКРЫВАЕТ МЫШЬ) */
 .downloadBtn .fill {
   position: absolute;
   left: 0;
@@ -125,12 +128,14 @@ button {
   z-index: 0;
 }
 
-/* ТЕКСТ */
+/* ТЕКСТ ПОВЕРХ */
 .downloadBtn span {
   position: relative;
   z-index: 2;
   pointer-events: none;
 }
+
+/* ========================= */
 
 /* PLAYER */
 #player {
