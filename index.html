@@ -279,6 +279,7 @@ function applySort(){
   cards = [];
 
   arr.forEach((t,i)=>{
+    const i = tracks.findIndex(x => x.id === t.id);
     const div = document.createElement("div");
     div.className = "card";
 
