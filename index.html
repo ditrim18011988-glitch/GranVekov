@@ -236,10 +236,16 @@ const title = document.getElementById("title");
 const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 const list = document.getElementById("list");
+const progress = document.getElementById("progress");
 
-/* ------------------ STATS FIX ------------------ */
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
 
-// создать документ статистики если его нет
+let current = -1;
+let cards = [];
+
+/* ------------------ STATS ------------------ */
+
 function ensureStats(id){
   const ref = db.collection("stats").doc(String(id));
 
@@ -250,14 +256,12 @@ function ensureStats(id){
   });
 }
 
-// обновить UI статистики
 function updateStatsUI(i, data){
   const card = cards[i];
   const stats = card.querySelector(".stats");
   stats.innerHTML = `👁 ${data.views || 0} ⬇ ${data.downloads || 0}`;
 }
 
-// увеличить просмотры
 function addView(id, i){
   const ref = db.collection("stats").doc(String(id));
 
@@ -270,7 +274,6 @@ function addView(id, i){
   });
 }
 
-// увеличить скачивания
 function addDownload(id, i){
   const ref = db.collection("stats").doc(String(id));
 
@@ -287,6 +290,15 @@ function addDownload(id, i){
 
 function safePlay(){
   audio.play().catch(()=>{});
+}
+
+function formatTime(sec){
+  if (!sec || isNaN(sec)) return "0:00";
+
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+
+  return m + ":" + (s < 10 ? "0" + s : s);
 }
 
 function load(i){
@@ -338,32 +350,31 @@ function toggleTrack(i){
   toggle();
 }
 
-/* =========================
-   🔥 ПРОГРЕСС-БАР
-   ========================= */
+/* ------------------ PROGRESS + TIME ------------------ */
 
-const progress = document.getElementById("progress");
-
-/* обновление полосы */
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
 
   progress.value = (audio.currentTime / audio.duration) * 100;
+
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  durationEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
 });
 
-/* сброс при загрузке */
 audio.addEventListener("loadedmetadata", () => {
   progress.value = 0;
+  currentTimeEl.textContent = "0:00";
+  durationEl.textContent = "-" + formatTime(audio.duration);
 });
 
-/* перемотка */
 progress.addEventListener("input", () => {
   if (!audio.duration) return;
 
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-/* UI */
+/* ------------------ UI ------------------ */
+
 function syncUI(){
   playBtn.textContent = audio.paused ? "▶️" : "⏸";
 
@@ -380,7 +391,8 @@ function syncUI(){
   });
 }
 
-/* CARDS */
+/* ------------------ CARDS ------------------ */
+
 tracks.forEach((t,i)=>{
 
   ensureStats(t.id);
@@ -411,7 +423,6 @@ tracks.forEach((t,i)=>{
     }
   });
 });
-
 /* DOWNLOAD */
 function downloadTrack(i){
   const t = tracks[i];
