@@ -197,3 +197,32 @@ button {
     height: 44px;
   }
 }
+.donateOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+}
+
+.donateBox{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  background:#1a1a25;
+  padding:20px;
+  border-radius:16px;
+  width:300px;
+  text-align:center;
+  box-shadow:0 0 30px rgba(255,60,60,0.3);
+  z-index:1000;
+}
+
+.donateBox button{
+  width:100%;
+  margin-top:8px;
+}
+
+.closeBtn{
+  background:#333;
+}
