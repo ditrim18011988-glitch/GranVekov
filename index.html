@@ -290,8 +290,6 @@ function addDownload(id, i){
   });
 }
 
-/* ------------------ PLAYER ------------------ */
-
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
@@ -305,7 +303,7 @@ const durationEl = document.getElementById("duration");
 let current = -1;
 let cards = [];
 
-/* ------------------ HELPERS ------------------ */
+/* ------------------ SAFE HELPERS ------------------ */
 
 function safePlay(){
   audio.play().catch(()=>{});
@@ -320,9 +318,11 @@ function formatTime(sec){
   return m + ":" + (s < 10 ? "0" + s : s);
 }
 
-/* ------------------ CORE PLAYER ------------------ */
+/* ------------------ PLAYER CORE ------------------ */
 
 function load(i){
+  if(!tracks[i]) return;
+
   current = i;
 
   audio.src = tracks[i].file;
@@ -337,23 +337,18 @@ function load(i){
   addView(tracks[i].id, i);
 }
 
-/* PLAY / PAUSE */
 function toggle(){
   if(current === -1){
     load(0);
     return;
   }
 
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
+  if(audio.paused) safePlay();
+  else audio.pause();
 
   syncUI();
 }
 
-/* NEXT / PREV */
 function next(){
   load((current + 1) % tracks.length);
 }
@@ -362,42 +357,34 @@ function prev(){
   load((current - 1 + tracks.length) % tracks.length);
 }
 
-/* toggle same track */
 function toggleTrack(i){
-  if(i !== current){
-    load(i);
-    return;
-  }
-
-  toggle();
+  if(i !== current) load(i);
+  else toggle();
 }
 
 /* ------------------ PROGRESS + TIME ------------------ */
 
 audio.addEventListener("timeupdate", () => {
-  if (!audio.duration) return;
+  if(!audio.duration) return;
 
   progress.value = (audio.currentTime / audio.duration) * 100;
 
-  if (currentTimeEl) {
+  if(currentTimeEl)
     currentTimeEl.textContent = formatTime(audio.currentTime);
-  }
 
-  if (durationEl) {
-    durationEl.textContent =
-      "-" + formatTime(audio.duration - audio.currentTime);
-  }
+  if(durationEl)
+    durationEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
 });
 
 audio.addEventListener("loadedmetadata", () => {
   progress.value = 0;
 
-  if (currentTimeEl) currentTimeEl.textContent = "0:00";
-  if (durationEl) durationEl.textContent = "-" + formatTime(audio.duration);
+  if(currentTimeEl) currentTimeEl.textContent = "0:00";
+  if(durationEl) durationEl.textContent = "-" + formatTime(audio.duration);
 });
 
 progress.addEventListener("input", () => {
-  if (!audio.duration) return;
+  if(!audio.duration) return;
 
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
@@ -452,42 +439,46 @@ tracks.forEach((t,i)=>{
     }
   });
 });
-/* DOWNLOAD */
+
+/* ------------------ DOWNLOAD ------------------ */
+
 function downloadTrack(i){
   const t = tracks[i];
   const card = cards[i];
+  if(!card) return;
+
   const fill = card.querySelector(".fill");
 
   const xhr = new XMLHttpRequest();
   xhr.open("GET", t.file);
   xhr.responseType = "blob";
 
-  xhr.onprogress=e=>{
+  xhr.onprogress = (e)=>{
     if(e.lengthComputable){
-      fill.style.width = (e.loaded/e.total)*100+"%";
+      fill.style.width = (e.loaded / e.total) * 100 + "%";
     }
   };
 
-  xhr.onload=()=>{
+  xhr.onload = ()=>{
     const url = URL.createObjectURL(xhr.response);
 
-    const a=document.createElement("a");
-    a.href=url;
-    a.download=t.title+".mp3";
-
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = t.title + ".mp3";
     a.click();
+
     URL.revokeObjectURL(url);
 
-    fill.style.width="0%";
+    fill.style.width = "0%";
 
-    // 🔥 DOWNLOAD COUNT
     addDownload(t.id, i);
   };
 
   xhr.send();
 }
 
-/* SEARCH */
+/* ------------------ SEARCH ------------------ */
+
 document.getElementById("search").addEventListener("input",(e)=>{
   const v = e.target.value.toLowerCase();
 
@@ -497,10 +488,7 @@ document.getElementById("search").addEventListener("input",(e)=>{
   });
 });
 
-/* PLACEHOLDERS */
+/* ------------------ PLACEHOLDERS ------------------ */
+
 function ads(){ alert("Реклама"); }
 function donate(){ alert("Донат"); }
-</script>
-
-</body>
-</html>
