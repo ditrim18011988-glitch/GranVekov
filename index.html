@@ -506,7 +506,20 @@ initCards();
 /* ------------------ PLACEHOLDERS ------------------ */
 
 function ads(){ alert("Реклама"); }
-function donate(){ alert("Донат"); }
+function donate(){
+  document.getElementById("donateModal").style.display = "block";
+}
+
+function closeDonate(){
+  document.getElementById("donateModal").style.display = "none";
+}
+
+/* ТВОЯ ССЫЛКА BOOSTY */
+const BOOSTY_URL = "https://boosty.to/granvekov/donate";
+
+function goBoosty(amount){
+  window.open(BOOSTY_URL, "_blank");
+}
 </script> 
 
 </body> 
