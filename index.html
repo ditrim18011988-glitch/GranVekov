@@ -248,6 +248,21 @@ const durationEl = document.getElementById("duration");
 let current = -1;
 let cards = [];
 
+/* ------------------ SAFE ------------------ */
+
+function safePlay(){
+  audio.play().catch(()=>{});
+}
+
+function formatTime(sec){
+  if (!sec || isNaN(sec)) return "0:00";
+
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+
+  return m + ":" + (s < 10 ? "0" + s : s);
+}
+
 /* ------------------ STATS ------------------ */
 
 function ensureStats(id){
@@ -262,6 +277,8 @@ function ensureStats(id){
 
 function updateStatsUI(i, data){
   const card = cards[i];
+  if(!card) return;
+
   const stats = card.querySelector(".stats");
   stats.innerHTML = `👁 ${data.views || 0} ⬇ ${data.downloads || 0}`;
 }
@@ -290,38 +307,10 @@ function addDownload(id, i){
   });
 }
 
-const audio = document.getElementById("audio");
-const title = document.getElementById("title");
-const cover = document.getElementById("cover");
-const playBtn = document.getElementById("playBtn");
-const list = document.getElementById("list");
-const progress = document.getElementById("progress");
-
-const currentTimeEl = document.getElementById("currentTime");
-const durationEl = document.getElementById("duration");
-
-let current = -1;
-let cards = [];
-
-/* ------------------ SAFE HELPERS ------------------ */
-
-function safePlay(){
-  audio.play().catch(()=>{});
-}
-
-function formatTime(sec){
-  if (!sec || isNaN(sec)) return "0:00";
-
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-
-  return m + ":" + (s < 10 ? "0" + s : s);
-}
-
-/* ------------------ PLAYER CORE ------------------ */
+/* ------------------ PLAYER ------------------ */
 
 function load(i){
-  if(!tracks[i]) return;
+  if(!tracks || !tracks[i]) return;
 
   current = i;
 
@@ -343,9 +332,7 @@ function toggle(){
     return;
   }
 
-  if(audio.paused) safePlay();
-  else audio.pause();
-
+  audio.paused ? safePlay() : audio.pause();
   syncUI();
 }
 
@@ -362,7 +349,7 @@ function toggleTrack(i){
   else toggle();
 }
 
-/* ------------------ PROGRESS + TIME ------------------ */
+/* ------------------ PROGRESS ------------------ */
 
 audio.addEventListener("timeupdate", () => {
   if(!audio.duration) return;
@@ -385,7 +372,6 @@ audio.addEventListener("loadedmetadata", () => {
 
 progress.addEventListener("input", () => {
   if(!audio.duration) return;
-
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
