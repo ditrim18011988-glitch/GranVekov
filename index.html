@@ -179,6 +179,10 @@ button, .downloadBtn{
 
   <div>
     <div id="title">Выбери трек</div>
+    <div>
+  <span id="currentTime">0:00</span>
+  <span id="duration">-0:00</span>
+</div>
 
     <div style="display:flex; gap:6px;">
       <button onclick="prev()">⏮</button>
@@ -357,14 +361,19 @@ audio.addEventListener("timeupdate", () => {
 
   progress.value = (audio.currentTime / audio.duration) * 100;
 
-  currentTimeEl.textContent = formatTime(audio.currentTime);
-  durationEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
+  if (currentTimeEl && durationEl) {
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+    durationEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
+  }
 });
 
 audio.addEventListener("loadedmetadata", () => {
   progress.value = 0;
-  currentTimeEl.textContent = "0:00";
-  durationEl.textContent = "-" + formatTime(audio.duration);
+
+  if (currentTimeEl && durationEl) {
+    currentTimeEl.textContent = "0:00";
+    durationEl.textContent = "-" + formatTime(audio.duration);
+  }
 });
 
 progress.addEventListener("input", () => {
