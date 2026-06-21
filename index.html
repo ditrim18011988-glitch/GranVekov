@@ -292,6 +292,21 @@ function addDownload(id, i){
 
 /* ------------------ PLAYER ------------------ */
 
+const audio = document.getElementById("audio");
+const title = document.getElementById("title");
+const cover = document.getElementById("cover");
+const playBtn = document.getElementById("playBtn");
+const list = document.getElementById("list");
+const progress = document.getElementById("progress");
+
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+
+let current = -1;
+let cards = [];
+
+/* ------------------ HELPERS ------------------ */
+
 function safePlay(){
   audio.play().catch(()=>{});
 }
@@ -304,6 +319,8 @@ function formatTime(sec){
 
   return m + ":" + (s < 10 ? "0" + s : s);
 }
+
+/* ------------------ CORE PLAYER ------------------ */
 
 function load(i){
   current = i;
@@ -345,6 +362,7 @@ function prev(){
   load((current - 1 + tracks.length) % tracks.length);
 }
 
+/* toggle same track */
 function toggleTrack(i){
   if(i !== current){
     load(i);
@@ -361,19 +379,21 @@ audio.addEventListener("timeupdate", () => {
 
   progress.value = (audio.currentTime / audio.duration) * 100;
 
-  if (currentTimeEl && durationEl) {
+  if (currentTimeEl) {
     currentTimeEl.textContent = formatTime(audio.currentTime);
-    durationEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
+  }
+
+  if (durationEl) {
+    durationEl.textContent =
+      "-" + formatTime(audio.duration - audio.currentTime);
   }
 });
 
 audio.addEventListener("loadedmetadata", () => {
   progress.value = 0;
 
-  if (currentTimeEl && durationEl) {
-    currentTimeEl.textContent = "0:00";
-    durationEl.textContent = "-" + formatTime(audio.duration);
-  }
+  if (currentTimeEl) currentTimeEl.textContent = "0:00";
+  if (durationEl) durationEl.textContent = "-" + formatTime(audio.duration);
 });
 
 progress.addEventListener("input", () => {
