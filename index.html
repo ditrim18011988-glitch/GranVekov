@@ -362,12 +362,7 @@ progress.addEventListener("input", () => {
 
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
-}
 
-function next(){ load((current+1)%tracks.length); }
-function prev(){ load((current-1+tracks.length)%tracks.length); }
-
-function toggleTrack(i){
   if(i !== current){
     load(i);
     return;
@@ -397,6 +392,7 @@ function syncUI(){
       btn.textContent = "▶ Play";
     }
   });
+  }
 
 /* CARDS */
 tracks.forEach((t,i)=>{
