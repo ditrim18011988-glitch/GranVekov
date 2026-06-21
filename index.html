@@ -38,16 +38,6 @@ body{
   width:200px;
 }
 
-/* 🔥 SORT BUTTON */
-#sortBtn{
-  padding:8px 12px;
-  border-radius:10px;
-  border:none;
-  background:#222236;
-  color:white;
-  cursor:pointer;
-}
-
 .logo{
   display:flex;
   justify-content:center;
@@ -84,6 +74,7 @@ body{
   border-radius:12px;
 }
 
+/* BUTTON */
 button{
   width:100%;
   margin-top:8px;
@@ -124,6 +115,11 @@ button{
 .downloadBtn span{
   position:relative;
   z-index:2;
+}
+
+/* 🔥 ВАЖНЫЙ ФИКС КУРСОРА */
+button, .downloadBtn{
+  cursor: pointer !important;
 }
 
 .stats{
@@ -168,10 +164,6 @@ button{
 
 <div class="topbar">
   <button onclick="ads()">📢 Реклама</button>
-
-  <!-- 🔥 SORT BUTTON -->
-  <button id="sortBtn">Сортировка <span id="sortArrow">↓</span></button>
-
   <input id="search" placeholder="Поиск музыки...">
   <button onclick="donate()">💰 Донат</button>
 </div>
@@ -188,9 +180,9 @@ button{
   <div>
     <div id="title">Выбери трек</div>
     <div>
-      <span id="currentTime">0:00</span>
-      <span id="duration">-0:00</span>
-    </div>
+  <span id="currentTime">0:00</span>
+  <span id="duration">-0:00</span>
+</div>
 
     <div style="display:flex; gap:6px;">
       <button onclick="prev()">⏮</button>
@@ -204,6 +196,7 @@ button{
   <audio id="audio"></audio>
 </div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
@@ -239,6 +232,7 @@ const tracks = [
   {id:1, title:"Чёрная лампа", file:"music/track1.mp3", cover:"music/cover1.jpg"}
 ];
 
+
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
@@ -251,68 +245,6 @@ const durationEl = document.getElementById("duration");
 
 let current = -1;
 let cards = [];
-
-/* 🔥 SORT STATE */
-let sortMode = localStorage.getItem("sortMode") || "new";
-let sortDir = localStorage.getItem("sortDir") || "desc";
-
-const sortBtn = document.getElementById("sortBtn");
-const sortArrow = document.getElementById("sortArrow");
-
-function updateArrow(){
-  sortArrow.textContent = sortDir === "desc" ? "↓" : "↑";
-}
-
-/* SORT */
-function applySort(){
-  let arr = [...tracks];
-
-  if(sortMode === "new"){
-    arr.sort((a,b)=> b.id - a.id);
-  } else {
-    arr.sort((a,b)=> (b.downloads||0) - (a.downloads||0));
-  }
-
-  if(sortDir === "asc") arr.reverse();
-
-  list.innerHTML = "";
-  cards = [];
-
-  arr.forEach((t,i)=>{
-    const i = tracks.findIndex(x => x.id === t.id);
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <img src="${t.cover}">
-      <h3>${t.title}</h3>
-      <div class="stats">👁 0 ⬇ 0</div>
-      <button onclick="toggleTrack(${i})">▶ Play</button>
-
-      <div class="downloadBtn" onclick="downloadTrack(${i})">
-        <div class="fill"></div>
-        <span>⬇ Скачать</span>
-      </div>
-    `;
-
-    list.appendChild(div);
-    cards.push(div);
-  });
-}
-
-/* BUTTON */
-sortBtn.addEventListener("click", ()=>{
-  sortDir = sortDir === "desc" ? "asc" : "desc";
-  localStorage.setItem("sortDir", sortDir);
-
-  updateArrow();
-  applySort();
-});
-
-/* INIT */
-updateArrow();
-applySort();
-
 
 /* ================= FIREBASE CHECK ================= */
 
