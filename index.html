@@ -339,7 +339,7 @@ function toggleTrack(i){
 }
 
 /* =========================
-   🔥 ПРОГРЕСС-БАР (НОВЫЙ)
+   🔥 ПРОГРЕСС-БАР
    ========================= */
 
 const progress = document.getElementById("progress");
@@ -351,7 +351,7 @@ audio.addEventListener("timeupdate", () => {
   progress.value = (audio.currentTime / audio.duration) * 100;
 });
 
-/* когда трек загрузился — знаем длительность */
+/* сброс при загрузке */
 audio.addEventListener("loadedmetadata", () => {
   progress.value = 0;
 });
@@ -362,20 +362,6 @@ progress.addEventListener("input", () => {
 
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
-
-  if(i !== current){
-    load(i);
-    return;
-  }
-
-  if(audio.paused){
-    safePlay();
-  } else {
-    audio.pause();
-  }
-
-  syncUI();
-}
 
 /* UI */
 function syncUI(){
@@ -392,7 +378,7 @@ function syncUI(){
       btn.textContent = "▶ Play";
     }
   });
-  }
+}
 
 /* CARDS */
 tracks.forEach((t,i)=>{
@@ -419,7 +405,6 @@ tracks.forEach((t,i)=>{
   list.appendChild(div);
   cards.push(div);
 
-  // загрузка текущей статистики
   db.collection("stats").doc(String(t.id)).onSnapshot(doc=>{
     if(doc.exists){
       updateStatsUI(i, doc.data());
