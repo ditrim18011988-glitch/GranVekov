@@ -296,13 +296,15 @@ function load(i){
   title.textContent = tracks[i].title;
   cover.src = tracks[i].cover;
 
+  audio.currentTime = 0;
   safePlay();
+
   syncUI();
 
-  // 🔥 VIEW COUNT
   addView(tracks[i].id, i);
 }
 
+/* PLAY / PAUSE */
 function toggle(){
   if(current === -1){
     load(0);
@@ -316,6 +318,50 @@ function toggle(){
   }
 
   syncUI();
+}
+
+/* NEXT / PREV */
+function next(){
+  load((current + 1) % tracks.length);
+}
+
+function prev(){
+  load((current - 1 + tracks.length) % tracks.length);
+}
+
+function toggleTrack(i){
+  if(i !== current){
+    load(i);
+    return;
+  }
+
+  toggle();
+}
+
+/* =========================
+   🔥 ПРОГРЕСС-БАР (НОВЫЙ)
+   ========================= */
+
+const progress = document.getElementById("progress");
+
+/* обновление полосы */
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+
+  progress.value = (audio.currentTime / audio.duration) * 100;
+});
+
+/* когда трек загрузился — знаем длительность */
+audio.addEventListener("loadedmetadata", () => {
+  progress.value = 0;
+});
+
+/* перемотка */
+progress.addEventListener("input", () => {
+  if (!audio.duration) return;
+
+  audio.currentTime = (progress.value / 100) * audio.duration;
+});
 }
 
 function next(){ load((current+1)%tracks.length); }
@@ -351,7 +397,6 @@ function syncUI(){
       btn.textContent = "▶ Play";
     }
   });
-}
 
 /* CARDS */
 tracks.forEach((t,i)=>{
