@@ -444,6 +444,7 @@ function downloadTrack(i){
   };
 
   xhr.onload = ()=>{
+
     const url = URL.createObjectURL(xhr.response);
 
     const a = document.createElement("a");
@@ -454,6 +455,20 @@ function downloadTrack(i){
     URL.revokeObjectURL(url);
 
     fill.style.width = "0%";
+
+    /* 💥 ВОТ ЭТО ТЫ ЗАБЫЛ */
+    db.collection("stats").doc(String(t.id)).set({
+      downloads: firebase.firestore.FieldValue.increment(1)
+    }, {merge:true})
+    .then(()=>{
+      // принудительное обновление UI
+      db.collection("stats").doc(String(t.id)).get()
+        .then(doc=>{
+          if(doc.exists){
+            updateStatsUI(i, doc.data());
+          }
+        });
+    });
   };
 
   xhr.send();
