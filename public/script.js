@@ -1,4 +1,5 @@
 const tracks = [
+  {id:16, title:"Северный рубеж V.2", file:"music/track1.1.mp3", cover:"music/cover1.1.png"},
   {id:15, title:"Крампус", file:"music/track15.mp3", cover:"music/cover15.png"},
   {id:14, title:"Северный рубеж", file:"music/track14.mp3", cover:"music/cover14.jpg"},
   {id:13, title:"Безмолвный город", file:"music/track13.mp3", cover:"music/cover13.jpg"},
