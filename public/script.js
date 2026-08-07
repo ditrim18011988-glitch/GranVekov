@@ -1,4 +1,5 @@
 const tracks = [
+  {id:20, title:"Сын Дьявола V.2", file:"music/track1.3.mp3", cover:"music/cover1.3.png"},
   {id:19, title:"Проклятье Салема", file:"music/track17.mp3", cover:"music/cover17.png"},
   {id:18, title:"Эпос Драконорождённый", file:"music/track16.mp3", cover:"music/cover16.png"},
   {id:17, title:"Аид V.2", file:"music/track1.2.mp3", cover:"music/cover1.2.png"},
