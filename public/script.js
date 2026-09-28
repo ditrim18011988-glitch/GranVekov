@@ -1,4 +1,5 @@
 const tracks = [
+  {id:22, title:"Голубой вагон", file:"music/track19.mp3", cover:"music/cover19.png"},
   {id:21, title:"Синий трактор", file:"music/track18.mp3", cover:"music/cover18.png"},
   {id:20, title:"Сын Дьявола V.2", file:"music/track1.3.mp3", cover:"music/cover1.3.png"},
   {id:19, title:"Проклятье Салема", file:"music/track17.mp3", cover:"music/cover17.png"},
